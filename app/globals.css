@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Tare design tokens — the grocery label, taken seriously.
+   Saturated color appears ONLY in verdict semantics. Nowhere else.
+   No dark mode: the app is paper and ink, one deliberate look.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  --color-paper: #faf9f5;
+  --color-ink: #16181c;
+  --color-graphite: #6a7078;
+  --color-rule: #e2e0d9;
+
+  --color-safe: #0e7c58;
+  --color-caution: #b26a12;
+  --color-avoid: #a82f22;
+  --color-unknown: #4a5a9e;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* Scale: 12/14/16/20/28/40/56 */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.5rem;
+  --text-3xl: 3.5rem;
+
+  /* Global radius 2px — not 0, not 16. */
+  --radius-xs: 2px;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Visible focus rings everywhere — part of the quality floor. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Dot leader: label ...... VALUE, as on a receipt. */
+  .leader {
+    flex: 1 1 auto;
+    align-self: end;
+    margin-bottom: 0.28em;
+    border-bottom: 1px dotted var(--color-rule);
+  }
+}
