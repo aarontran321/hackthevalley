@@ -41,7 +41,7 @@ export default function WeeklySummaryPage() {
             <section className="card card-pad" style={{ marginTop: 20 }}><div className="eyebrow">Preference-friendly swaps</div><div className="grid-2" style={{ marginTop: 16 }}>{summary.alternatives.map((item) => <div key={item.name} style={{ padding: 17, background: "#f4f1eb", borderRadius: 15 }}><b>{item.name}</b><p className="muted" style={{ marginBottom: 0, lineHeight: 1.5 }}>{item.reason}</p></div>)}</div></section>
             <section className="card card-pad" style={{ marginTop: 20, background: "var(--lavender)" }}><div className="eyebrow">Questions for your care team</div>{summary.providerQuestions.map((item) => <p key={item}>“{item}”</p>)}</section>
             <div className="notice" style={{ marginTop: 20 }}><b>Important limitations:</b> {summary.limitations.join(" ")} BumpSafe never uses logged scans to diagnose a nutrient deficiency.</div>
-            <div className="no-print" style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 25 }}><button className="btn btn-outline" onClick={generate} disabled={loading}>{loading ? "Refreshing…" : "Refresh with Gemini"}</button><button className="btn btn-soft" onClick={demo}>Reset to demo summary</button></div>
+            <div className="no-print" style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 25 }}><button className="btn btn-outline" onClick={generate} disabled={loading}>{loading ? "Refreshing…" : "Refresh with Gemini"}</button></div>
           </article>}
       </main>
     </AppShell>

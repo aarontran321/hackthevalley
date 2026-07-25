@@ -9,7 +9,7 @@ const schema = z.object({ query: z.string().min(2).max(500), profile: profileSch
 export async function POST(request: NextRequest) {
   try {
     const body = schema.parse(await request.json());
-    return NextResponse.json({ analysis: await withTimeout(analyseItem({ profile: body.profile, item: { searchQuery: body.query }, mode: "text" })) });
+    return NextResponse.json({ analysis: await withTimeout(analyseItem({ profile: body.profile, item: { query: body.query }, mode: "text" })) });
   } catch (error) {
     return apiError(error);
   }

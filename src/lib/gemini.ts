@@ -68,6 +68,19 @@ const allSourcesText = GUIDELINES.map(
   (g) => `[${g.id}] ${g.authority} — ${g.title}\n${g.summary}`,
 ).join("\n\n");
 
+/**
+ * Ordinary text searches such as "apple with peanut butter" may not trigger a
+ * high-stakes hazard keyword. They still deserve a useful report, so give the
+ * model a small cross-authority baseline covering nutrition, produce safety,
+ * allergens, and handling. This is not permission to infer beyond the corpus.
+ */
+const TEXT_SEARCH_BASELINE_IDS = [
+  "ACOG-NUTRITION-01",
+  "CDC-SAFERFOOD-2025",
+  "FDA-ALLERGIES-2025",
+  "HC-SAFEFOOD-2025",
+];
+
 const analysisResponseSchema = {
   type: Type.OBJECT,
   required: ["itemName", "status", "summary", "explanation", "flaggedIngredients", "trimesterContext", "conditionContext", "moderationGuidance", "alternatives", "questionsForProvider", "confidence", "sourceIds", "limitations"],
@@ -179,7 +192,13 @@ export async function analyseItem(input: {
   // --- Layer 1: deterministic rules, before the model is consulted at all.
   const item = toFoodItem(input.item);
   const matches = runRules(item, { trimester, conditions });
-  const guidelines = retrieveGuidelines(item, matches, { conditions });
+  const retrievedGuidelines = retrieveGuidelines(item, matches, { conditions });
+  const guidelines =
+    input.mode === "text" && retrievedGuidelines.length === 0
+      ? TEXT_SEARCH_BASELINE_IDS
+          .map((id) => GUIDELINE_BY_ID.get(id))
+          .filter((guideline): guideline is NonNullable<typeof guideline> => Boolean(guideline))
+      : retrievedGuidelines;
 
   // Nothing retrieved and no rule fired: no hazard document could apply, so
   // answer deterministically rather than inviting the model to reach for one.
@@ -208,11 +227,13 @@ export async function analyseItem(input: {
           buildPrecheckText(matches),
           ``,
           `APPROVED GUIDANCE SOURCES (the only IDs you may cite):`,
-          buildSourcesText(guidelines.length > 0 ? guidelines : GUIDELINES.slice(0, 6)),
+          buildSourcesText(guidelines.length > 0 ? guidelines : GUIDELINES.slice(0, 8)),
           ``,
           input.imageDataUrl
             ? `For the image, first identify the likely item, visible ingredients and preparation, and reflect uncertainty in limitations and confidence.`
-            : `Return the requested structured analysis.`,
+            : input.mode === "text"
+              ? `Interpret the user's named food or meal literally. Give a useful item-specific report using only the supplied guidance. If preparation, pasteurization, portion, allergens, or ingredients are unknown, state that uncertainty rather than treating the item as unidentified.`
+              : `Return the requested structured analysis.`,
         ].join("\n"),
       },
     ];

@@ -171,10 +171,18 @@ export default function AnalysisPage() {
             <div className="eyebrow"><BookOpen size={13} style={{ display: "inline", marginRight: 6 }} />Grounded in trusted guidance</div>
             <h2 style={{ margin: "10px 0 4px", fontSize: 19 }}>Sources used</h2>
             {sourceCards.length ? sourceCards.map((source) => (
-              <a key={source.id} href={source.url} target="_blank" rel="noreferrer" style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "13px 0", borderTop: "1px solid var(--line)" }}>
+              <a
+                key={source.id}
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open ${source.title} from ${source.organization}`}
+                title={source.url}
+                style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "13px 0", borderTop: "1px solid var(--line)" }}
+              >
                 <span>
                   <b>{source.title}</b><br />
-                  <small className="muted mono" style={{ fontSize: 11.5 }}>{source.organization} · {source.id}</small>
+                  <small className="muted mono" style={{ fontSize: 11.5 }}>{source.organization} · Open official guidance ↗</small>
                 </span>
                 <ExternalLink size={16} />
               </a>
