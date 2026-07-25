@@ -31,7 +31,7 @@ export default function Dashboard() {
           <div><div className="eyebrow">Saturday, July 25</div><h1 className="title" style={{ margin: "9px 0 8px" }}>Good morning, {profile.name}.</h1><p className="muted" style={{ margin: 0 }}>A calm look at your food week so far.</p></div>
           <Link href="/scan" className="btn btn-primary"><ScanLine size={18} /> Quick scan</Link>
         </section>
-        <section className="card" style={{ padding: 28, background: "linear-gradient(110deg,#e2ebdf,#f4e2dd)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
+        <section className="card" style={{ padding: 28, background: "#e7dfe0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
           <div><div className="eyebrow">Your pregnancy</div><div style={{ display: "flex", gap: 12, alignItems: "baseline", marginTop: 8 }}><b style={{ fontFamily: "Georgia,serif", fontSize: 42 }}>Week {profile.pregnancyWeek}</b><span className="muted">· Trimester {trimesterForWeek(profile.pregnancyWeek)}</span></div></div>
           <Link href="/profile" className="btn btn-outline" style={{ background: "rgba(255,255,255,.45)" }}>Edit profile</Link>
         </section>

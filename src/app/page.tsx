@@ -21,7 +21,7 @@ export default function Landing() {
               <span><CheckCircle2 size={15} style={{ display: "inline", color: "#4d775d", marginRight: 6 }} />Calm, clear language</span>
             </div>
           </div>
-          <div className="card fade-up" style={{ padding: 22, position: "relative", overflow: "hidden", background: "linear-gradient(145deg,#f7e7df,#e3ecdf)" }}>
+          <div className="card fade-up" style={{ padding: 22, position: "relative", overflow: "hidden", background: "#e7dfe0" }}>
             <div style={{ background: "rgba(255,253,249,.92)", borderRadius: 20, padding: 24, margin: "34px 12px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 10 }}>
                 <div><div className="eyebrow">Just analysed</div><h3 style={{ margin: "8px 0", fontSize: 23 }}>Imported soft cheese</h3></div>
