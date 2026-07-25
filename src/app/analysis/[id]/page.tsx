@@ -93,6 +93,11 @@ export default function AnalysisPage() {
           <ArrowLeft size={17} /> Back to scan
         </Link>
 
+        {/* Kept deliberately. 59023df removed this label so seeded fallback
+            would "read as a normal live result"; the README's own rule is that
+            seeded content is always labelled and never presented as live
+            Gemini output, and this is a health tool whose value is that a
+            verdict can be checked. */}
         {analysis.isDemo && (
           <div className="notice" style={{ marginTop: 18 }}>
             <b>Demo result:</b> seeded sample data for a reliable presentation, not a live Gemini response.
