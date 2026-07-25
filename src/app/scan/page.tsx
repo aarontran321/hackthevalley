@@ -6,6 +6,7 @@ import { Barcode, Camera, ImageIcon, Keyboard, LoaderCircle, PlayCircle, ScanLin
 import { AppShell } from "@/components/app-shell";
 import { FileUpload } from "@/components/file-upload";
 import { BarcodeCamera } from "@/components/barcode-camera";
+import { FoodCamera } from "@/components/food-camera";
 import { StatusBadge } from "@/components/icons";
 import { apiPost, imageToDataUrl } from "@/lib/client-api";
 import { storage } from "@/lib/storage";
@@ -28,6 +29,7 @@ export default function ScanPage() {
   const [loading, setLoading] = useState("");
   const [error, setError] = useState("");
   const [camera, setCamera] = useState(false);
+  const [foodCamera, setFoodCamera] = useState(false);
   const [preview, setPreview] = useState("");
   const [screenshotItems, setScreenshotItems] = useState<ScreenshotItem[]>([]);
 
@@ -54,7 +56,7 @@ export default function ScanPage() {
   };
 
   const analyseImage = async (file: File, screenshot: boolean) => {
-    setError(""); setScreenshotItems([]); setLoading(screenshot ? "Finding every visible product…" : "Identifying your food…");
+    setError(""); setScreenshotItems([]); setFoodCamera(false); setLoading(screenshot ? "Finding every visible product…" : "Identifying your food…");
     try {
       const image = await imageToDataUrl(file);
       setPreview(image);
@@ -91,7 +93,7 @@ export default function ScanPage() {
         </div>
         <div className="card" style={{ maxWidth: 900, margin: "0 auto", overflow: "hidden" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", borderBottom: "1px solid var(--line)", overflowX: "auto" }}>
-            {tabs.map(({ id, label, icon: Icon }) => <button type="button" key={id} onClick={() => { setMode(id); setError(""); setPreview(""); setScreenshotItems([]); }} style={{ minWidth: 130, padding: "18px 10px", border: 0, borderBottom: mode === id ? "3px solid var(--ink)" : "3px solid transparent", background: mode === id ? "#f5f1e9" : "transparent", cursor: "pointer", fontWeight: 750 }}><Icon size={18} style={{ verticalAlign: "middle", marginRight: 7 }} />{label}</button>)}
+            {tabs.map(({ id, label, icon: Icon }) => <button type="button" key={id} onClick={() => { setMode(id); setError(""); setPreview(""); setScreenshotItems([]); setFoodCamera(false); }} style={{ minWidth: 130, padding: "18px 10px", border: 0, borderBottom: mode === id ? "3px solid var(--ink)" : "3px solid transparent", background: mode === id ? "#f5f1e9" : "transparent", cursor: "pointer", fontWeight: 750 }}><Icon size={18} style={{ verticalAlign: "middle", marginRight: 7 }} />{label}</button>)}
           </div>
           <div className="card-pad" style={{ minHeight: 340 }}>
             {mode === "barcode" && <div>
@@ -107,7 +109,8 @@ export default function ScanPage() {
             {mode === "photo" && <div>
               <h2 style={{ marginTop: 0 }}>Photograph a food or meal</h2>
               <p className="muted">Useful for restaurant meals, deli items, produce, and products without readable packaging.</p>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 22 }}><FileUpload capture onFile={(file) => analyseImage(file, false)} label="Take a photo" /><FileUpload onFile={(file) => analyseImage(file, false)} label="Upload image" /></div>
+              {foodCamera && <div style={{ margin: "20px 0" }}><FoodCamera onCapture={(file) => analyseImage(file, false)} onClose={() => setFoodCamera(false)} /></div>}
+              {!foodCamera && <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 22 }}><button type="button" className="btn btn-outline" onClick={() => setFoodCamera(true)}><Camera size={18} /> Take a photo</button><FileUpload onFile={(file) => analyseImage(file, false)} label="Upload image" /></div>}
             </div>}
             {mode === "screenshot" && <div>
               <h2 style={{ marginTop: 0 }}>Analyse an online shopping screen</h2>
