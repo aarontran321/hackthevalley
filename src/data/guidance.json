@@ -284,6 +284,11 @@
     "summary": "A riskier-versus-safer table covering meat, deli salads, produce, juice, milk, cheese, eggs, seafood and flour. Deli meat and deli-sliced cheese should be heated to 165°F or until steaming. Premade deli salads, unpasteurized juice, and raw flour dough are listed as riskier choices.",
     "applicableRisks": [
       "deli salad",
+      "fruit",
+      "vegetable",
+      "produce",
+      "apple",
+      "berries",
       "coleslaw",
       "potato salad",
       "tuna salad",
@@ -311,6 +316,13 @@
       "calcium",
       "protein",
       "nutrition",
+      "fruit",
+      "vegetable",
+      "nuts",
+      "seeds",
+      "whole grain",
+      "yogurt",
+      "snack",
       "vitamin d",
       "choline",
       "omega-3"
@@ -350,6 +362,152 @@
       "medication interaction",
       "tea",
       "tincture"
+    ]
+  },
+  {
+    "id": "HC-SAFEFOOD-2025",
+    "title": "Safe food handling for pregnant people",
+    "organization": "Health Canada",
+    "url": "https://www.canada.ca/en/health-canada/services/publications/food-nutrition/safe-food-handling-pregnant-people.html",
+    "topic": "Food handling and storage",
+    "hazardClass": "listeria",
+    "summary": "Food poisoning can be more serious during pregnancy. Health Canada recommends careful shopping, cleaning, separating, cooking, chilling, thawing, and storage practices, with extra care for higher-risk refrigerated and ready-to-eat foods.",
+    "applicableRisks": [
+      "leftover",
+      "storage",
+      "refrigerated",
+      "frozen",
+      "meal prep",
+      "takeout",
+      "buffet",
+      "ready to eat",
+      "food handling"
+    ]
+  },
+  {
+    "id": "CDC-TOXO-2024",
+    "title": "Preventing toxoplasmosis",
+    "organization": "Centers for Disease Control and Prevention",
+    "url": "https://www.cdc.gov/toxoplasmosis/prevention/index.html",
+    "topic": "Toxoplasmosis",
+    "hazardClass": "raw-animal-product",
+    "summary": "Use a food thermometer to cook meat to a safe internal temperature, rinse produce under running water, avoid unpasteurized goat milk and raw or undercooked shellfish, and clean utensils and surfaces after contact with raw foods.",
+    "applicableRisks": [
+      "raw meat",
+      "rare meat",
+      "undercooked",
+      "oyster",
+      "mussel",
+      "clam",
+      "goat milk",
+      "unwashed produce",
+      "toxoplasmosis"
+    ]
+  },
+  {
+    "id": "FDA-EATINGOUT-2025",
+    "title": "Eating out and bringing food home during pregnancy",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/people-risk-foodborne-illness/eating-out-bringing-food-safety-moms-be",
+    "topic": "Restaurant and takeout food",
+    "hazardClass": "listeria",
+    "summary": "When eating out during pregnancy, choose clean establishments, avoid raw or undercooked animal foods, refrigerate takeout and leftovers promptly, and reheat leftovers thoroughly before eating.",
+    "applicableRisks": [
+      "restaurant",
+      "takeout",
+      "delivery",
+      "leftover",
+      "doggie bag",
+      "buffet",
+      "catering",
+      "meal",
+      "dining"
+    ]
+  },
+  {
+    "id": "FDA-SEAFOOD-2025",
+    "title": "Meat, poultry and seafood safety for pregnancy",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/people-risk-foodborne-illness/meat-poultry-seafood-food-safety-moms-be",
+    "topic": "Cooking meat and seafood",
+    "hazardClass": "raw-animal-product",
+    "summary": "Avoid raw or undercooked finfish and shellfish during pregnancy. Cook seafood, meat, and poultry thoroughly, prevent raw juices from contaminating other food, and keep foods refrigerated while marinating.",
+    "applicableRisks": [
+      "seafood",
+      "shellfish",
+      "oyster",
+      "scallop",
+      "shrimp",
+      "lobster",
+      "fish",
+      "chicken",
+      "poultry",
+      "steak",
+      "marinade"
+    ]
+  },
+  {
+    "id": "NHS-IRON-2024",
+    "title": "Iron deficiency anaemia",
+    "organization": "NHS",
+    "url": "https://www.nhs.uk/conditions/iron-deficiency-anaemia/",
+    "topic": "Iron-rich foods",
+    "hazardClass": "none",
+    "summary": "Pregnancy is a common cause of iron deficiency anaemia. Iron-containing foods include dark-green leafy vegetables, fortified cereals and bread, meat, dried fruit, beans, peas, and lentils. A clinician should assess symptoms and recommend treatment.",
+    "applicableRisks": [
+      "iron",
+      "anaemia",
+      "anemia",
+      "lentil",
+      "bean",
+      "peas",
+      "leafy greens",
+      "fortified cereal",
+      "dried fruit",
+      "meat"
+    ]
+  },
+  {
+    "id": "HC-PRENATAL-NUTRITION-2023",
+    "title": "Prenatal nutrition and food safety",
+    "organization": "Public Health Agency of Canada",
+    "url": "https://www.canada.ca/en/public-health/services/publications/healthy-living/maternity-newborn-care-guidelines-chapter-3.html",
+    "topic": "Prenatal nutrition and herbal tea",
+    "hazardClass": "none",
+    "summary": "Canadian prenatal guidance covers a varied diet, folate-rich foods, food safety, fish and mercury, caffeine, and herbal teas. Not every herbal tea is appropriate during pregnancy, so ingredients should be checked rather than assuming caffeine-free means pregnancy-suitable.",
+    "applicableRisks": [
+      "herbal tea",
+      "chamomile",
+      "aloe",
+      "comfrey",
+      "senna",
+      "ginger tea",
+      "rosehip",
+      "nutrition",
+      "folate"
+    ]
+  },
+  {
+    "id": "FDA-ALLERGIES-2025",
+    "title": "Food allergies and allergen labeling",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/food-labeling-nutrition/food-allergies",
+    "topic": "Food allergies",
+    "hazardClass": "none",
+    "summary": "Food labels must identify major allergens. People with food allergies should read ingredient and contains statements carefully and consider cross-contact warnings; an uncertain or incomplete label cannot confirm that a product fits an individual allergy.",
+    "applicableRisks": [
+      "allergy",
+      "allergen",
+      "peanut",
+      "tree nut",
+      "milk",
+      "egg",
+      "wheat",
+      "soy",
+      "sesame",
+      "fish",
+      "shellfish",
+      "contains"
     ]
   }
 ]

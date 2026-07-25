@@ -126,8 +126,14 @@ export function Receipt({
             {sources.map((s) => (
               <li key={s.id} className="receipt-cite">
                 <span aria-hidden style={{ color: "var(--muted)" }}>↳ </span>
-                <a href={s.url} target="_blank" rel="noreferrer">
-                  {s.id} ↗
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Open ${s.title} from ${s.organization}`}
+                  title={s.url}
+                >
+                  {s.title} · {s.organization} ↗
                 </a>
               </li>
             ))}

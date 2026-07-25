@@ -22,7 +22,7 @@ function normalize(s: string): string {
  * Cap on how many documents go in the prompt. All of them would still fit, but
  * a tighter set measurably reduces the model reaching for a marginal citation.
  */
-const MAX_DOCS = 6;
+const MAX_DOCS = 8;
 
 export function retrieveGuidelines(
   item: FoodItem,

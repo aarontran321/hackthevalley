@@ -9,7 +9,7 @@ import { BarcodeCamera } from "@/components/barcode-camera";
 import { StatusBadge } from "@/components/icons";
 import { apiPost, imageToDataUrl } from "@/lib/client-api";
 import { storage } from "@/lib/storage";
-import { demoAnalyses, demoScreenshotItems } from "@/data/demo";
+import { demoScreenshotItems } from "@/data/demo";
 import type { FoodAnalysis, ScreenshotItem } from "@/types";
 
 type Mode = "barcode" | "photo" | "screenshot" | "text";
@@ -37,7 +37,7 @@ export default function ScanPage() {
   }, [router]);
 
   const handleError = (value: unknown) => {
-    setError(value instanceof Error ? value.message : "Something went wrong. Try a demo example.");
+    setError(value instanceof Error ? value.message : "Something went wrong. Please try again.");
     setLoading("");
   };
 
@@ -129,10 +129,6 @@ export default function ScanPage() {
             {!!screenshotItems.length && <div><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "25px 0 12px" }}><h3 style={{ margin: 0 }}>{screenshotItems.length} products detected</h3><span className="status status-insufficient">Gemini analysis</span></div><div className="grid-2">{screenshotItems.map((item, i) => <div className="card card-pad" key={`${item.name}-${i}`}><small className="muted">{item.brand || "Brand not visible"} · {Math.round(item.confidence * 100)}% identified</small><h3 style={{ margin: "7px 0 10px" }}>{item.name}</h3>{item.analysis && <><StatusBadge status={item.analysis.status} /><p className="muted" style={{ lineHeight: 1.5, fontSize: 14 }}>{item.analysis.summary}</p><button type="button" className="btn btn-outline" onClick={() => openAnalysis(item.analysis!)}>Full analysis</button></>}</div>)}</div></div>}
           </div>
         </div>
-        <section style={{ maxWidth: 900, margin: "22px auto 0" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}><PlayCircle size={18} /><b>Try a reliable demo example</b><span className="muted" style={{ fontSize: 12 }}>Seeded data, clearly labeled</span></div>
-          <div className="grid-3">{demoAnalyses.map((analysis) => <button type="button" key={analysis.id} onClick={() => openAnalysis(analysis)} className="card card-pad" style={{ textAlign: "left", cursor: "pointer", color: "inherit" }}><StatusBadge status={analysis.status} /><b style={{ display: "block", marginTop: 12 }}>{analysis.itemName}</b></button>)}</div>
-        </section>
       </main>
     </AppShell>
   );
