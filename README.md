@@ -1,63 +1,114 @@
-# BumpSafe
+# nutri.ai
 
 **Know what’s on your plate, and why it matters.**
 
-BumpSafe is an AI-powered pregnancy food safety and nutrition assistant. It helps pregnant users check packaged products, meals, and online listings against their pregnancy stage, health context, allergies, and dietary preferences. It presents calm, structured educational guidance with the exact ingredient or product characteristic that affected its result.
+nutri.ai is an AI-powered pregnancy food-safety and nutrition assistant. It combines a user’s pregnancy stage, health context, allergies, and dietary preferences with product data, food images, and curated public-health guidance to produce calm, structured educational reports.
 
-Pregnancy is a particularly important use case because foodborne-illness precautions, caffeine context, and nutritional needs can differ from the general population—and vague or alarmist search results are hard to act on. BumpSafe makes the reasoning visible and grounds medical and food-safety claims in a curated set of public-health source summaries.
+Pregnancy is a particularly important use case because foodborne-illness precautions, caffeine context, and nutritional needs can differ from those of the general population. nutri.ai makes the reasoning visible: results identify the ingredient or characteristic that affected the verdict, disclose uncertainty, and link to the public-health guidance used.
 
-> BumpSafe provides educational information and is not medical advice. Food safety and nutritional needs vary by person and pregnancy. Confirm important decisions with a qualified healthcare professional.
+> **nutri.ai provides educational information and is not medical advice.** Food safety and nutritional needs vary by person and pregnancy. Confirm important decisions with a qualified healthcare professional.
 
-## Demo highlights
+## Current MVP
 
-- Local pregnancy profile with automatically calculated trimester
-- Camera or manual barcode entry with Open Food Facts lookup
-- Gemini multimodal analysis for meal photos
-- Multi-product extraction and analysis from shopping/menu screenshots
-- Source-grounded, structured pregnancy-aware results
-- Ingredient-level reasoning, confidence, limitations, and preference-matched alternatives
-- Contextual follow-up chat
-- Local consumption tracker with editing, filtering, and weekly chart
-- Gemini weekly pattern synthesis without deficiency diagnosis
-- Seeded examples and a mock shopping screenshot for a reliable offline-friendly demo
+- Pregnancy profile with due-date or last-period calculation, trimester, baby count, age, height, pre-pregnancy/current weight, conditions, allergies, restrictions, and dietary preferences
+- Fast camera barcode scanner with a visible targeting frame, animated scan line, rear-camera preference on mobile, flashlight support where available, and manual entry fallback
+- Server-side Open Food Facts lookup with ingredients, allergens, additives, labels, categories, serving size, images, nutrition data, and catalogue completeness
+- Live Gemini analysis for barcodes, meal photos, screenshots, and text searches
+- Multi-product extraction from shopping, delivery, grocery, and restaurant screenshots
+- Structured results with four supported statuses:
+  - Generally suitable
+  - Use caution
+  - Consider avoiding
+  - Not enough information
+- Ingredient-level explanations, trimester and condition context, moderation guidance, alternatives, confidence, limitations, and provider questions
+- Clickable public-health source cards
+- Context-preserving follow-up chat on each analysis
+- Global Ask assistant available from every page
+- Local consumption tracker with editing, filtering, weekly charts, and analysis links
+- Gemini weekly pattern summaries and week-level follow-up chat
+- Responsive, squared editorial interface under the `nutri.ai` brand
 
-Seeded content is always labeled **Demo data** and is never presented as live Gemini output.
+Sparse or unknown catalogue records degrade honestly. The app still produces a limited report explaining what information is missing, rather than inventing a product identity or ingredient list.
+
+## Tech stack
+
+| Area | Technology |
+| --- | --- |
+| Framework | Next.js 16 App Router |
+| UI | React 19, TypeScript, Tailwind CSS 4, custom CSS design system |
+| AI | Google Gemini / Vertex AI through `@google/genai` |
+| Validation | Zod and Gemini structured-output schemas |
+| Barcode scanning | `@zxing/browser` and `@zxing/library` |
+| Product data | Open Food Facts API |
+| Charts | Recharts |
+| Icons | Lucide React |
+| MVP persistence | Browser `localStorage` |
+| Quality checks | ESLint, TypeScript, Next.js production build |
+
+No Gemini key is exposed to client-side code. All model calls run through Next.js server routes.
 
 ## How Gemini is used
 
-Gemini is the reasoning and synthesis layer; curated public-health guidance is the fact layer.
+Gemini is the reasoning and synthesis layer; the repository-controlled guidance corpus is the medical and food-safety fact layer.
 
-1. **Multimodal food identification:** Gemini vision identifies likely foods, visible ingredients, preparation cues, and uncertainty from a meal photo.
-2. **Screenshot understanding:** It extracts every visible food or product from a shopping, delivery, or restaurant screenshot and returns a location and confidence for each.
-3. **Personalized reasoning:** Structured product details are considered alongside pregnancy week/trimester, conditions, allergies, and dietary preferences.
-4. **Ingredient-level explanations and alternatives:** The result identifies the exact characteristic behind a caution and suggests a similar option that fits the profile.
-5. **Follow-up conversation:** The current profile, result, conversation, and same approved sources stay in context.
-6. **Weekly pattern analysis:** Gemini synthesizes only logged foods, using careful wording such as “few identifiable iron-rich foods” rather than diagnosing deficiency.
-7. **Source grounding:** The model receives repository-controlled source summaries and may cite only their supplied IDs. Unknown IDs are removed server-side; an unsupported conclusion is downgraded to “Not enough information.”
+1. **Multimodal food identification**  
+   Gemini vision identifies likely foods, visible ingredients, preparation cues, and uncertainty from meal photos.
 
-All model responses used by the interface are JSON-schema constrained and validated with Zod. Gemini keys and calls remain server-side.
+2. **Screenshot understanding**  
+   Gemini extracts every visible food or product from a shopping, delivery, grocery, or restaurant screenshot and returns separate item-level analyses.
 
-## Technology
+3. **Personalized safety reasoning**  
+   Product or image details are considered alongside pregnancy week and trimester, health conditions, allergies, avoided foods, and dietary preferences.
 
-- Next.js App Router, React, and TypeScript
-- Tailwind CSS plus a small custom design system
-- Google Gemini via `@google/genai`
-- Zod validation and Gemini structured output schemas
-- Open Food Facts API
-- `@zxing/browser` barcode camera scanner
-- Recharts
-- Browser local storage for profile, analyses, log, and weekly summary
+4. **Ingredient-level explanation and alternatives**  
+   Reports identify the specific ingredient or characteristic behind a caution and suggest alternatives that respect the user’s preferences.
+
+5. **Follow-up conversation**  
+   Analysis chat retains the current profile, product, structured verdict, conversation, and approved sources. Responses are intentionally concise and conversational.
+
+6. **Weekly pattern analysis**  
+   Gemini examines only logged foods and uses non-diagnostic wording such as “few identifiable iron-rich foods were logged.”
+
+7. **Global Ask assistant**  
+   The app-wide assistant can answer broader pregnancy food questions and use recent locally stored scans as context.
+
+8. **Source-grounded responses**  
+   The model receives selected summaries from a curated 26-source corpus covering FDA, CDC, ACOG, NHS, Health Canada, and the Public Health Agency of Canada. It may cite only supplied source IDs.
+
+Gemini responses used by the report interface are JSON-schema constrained and validated with Zod. A deterministic rule layer establishes a minimum severity for high-stakes hazards. Unknown citations, unsupported cautions, and attempted severity downgrades are rejected before reaching the UI.
+
+## Grounding and safety architecture
+
+The grounding corpus lives at [`src/data/guidance.json`](src/data/guidance.json). Retrieval and enforcement live under [`src/lib/spine`](src/lib/spine).
+
+The analysis pipeline is:
+
+1. Normalize product, text, or image-derived information.
+2. Run deterministic checks for known high-stakes pregnancy hazards.
+3. Retrieve relevant guidance plus a broad baseline for sparse products.
+4. Ask Gemini for a structured, personalized explanation.
+5. Validate the JSON response with Zod.
+6. Remove unknown source IDs and enforce the deterministic severity floor.
+7. Fall back to a transparent rule-only result if Gemini is unavailable.
+
+The app never diagnoses a condition, recommends supplement dosages, advises stopping medication, makes absolute guarantees, or provides appearance/weight-loss recommendations.
 
 ## Local setup
 
-Requires Node.js 20.9 or newer.
+### Requirements
+
+- Node.js 20.9 or newer
+- npm
+- A Gemini Developer API key or Vertex AI Express Mode key
+
+### Install
 
 ```bash
 npm install
 cp .env.example .env.local
 ```
 
-Add a server-side Gemini API key:
+### Gemini Developer API
 
 ```env
 GEMINI_API_KEY=your_key_here
@@ -65,7 +116,7 @@ GEMINI_MODEL=gemini-3.6-flash
 GOOGLE_GENAI_USE_VERTEXAI=false
 ```
 
-To use a Vertex AI Express Mode API key instead, set:
+### Vertex AI Express Mode
 
 ```env
 GEMINI_API_KEY=your_vertex_express_key
@@ -73,70 +124,87 @@ GEMINI_MODEL=gemini-3.6-flash
 GOOGLE_GENAI_USE_VERTEXAI=true
 ```
 
-For full Vertex AI authentication with Application Default Credentials, also set
-`GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION=global`, enable the Vertex AI
-API, and run `gcloud auth application-default login` locally.
+For full Vertex AI authentication with Application Default Credentials, also set:
 
-Run the development server:
+```env
+GOOGLE_CLOUD_PROJECT=your_project_id
+GOOGLE_CLOUD_LOCATION=global
+```
+
+Enable the Vertex AI API and run:
+
+```bash
+gcloud auth application-default login
+```
+
+Never prefix the key with `NEXT_PUBLIC_`. `.env` and `.env.local` are ignored by Git.
+
+### Run
 
 ```bash
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
 
-## Chrome extension
-
-`extension/` contains a companion "BumpSafe Scanner" browser extension that
-screenshots the current tab, scans it for products via the same Gemini
-screenshot-analysis endpoint, and lets you click a detected product to send it
-into the running BumpSafe app. See `extension/README.md` for setup.
-
-Quality checks:
+### Validate
 
 ```bash
 npm run lint
 npm run typecheck
 npm run build
+bash scripts/check-citations.sh
 ```
 
-Open Food Facts does not require a key. Barcode data is fetched server-side from its public API. A missing product returns a helpful prompt to try photo or text input.
+## Demo flow
 
-### Demo mode
+1. Open **Profile** and configure a third-trimester pregnancy context.
+2. Open **Scan → Barcode** and scan a product or enter its digits.
+3. Show the live Gemini report, exact flagged ingredient, confidence, limitations, and source cards.
+4. Ask a concise follow-up question from the analysis page.
+5. Open **Scan → Food photo** and take or upload a meal photo.
+6. Open **Scan → Screenshot** and upload a shopping or restaurant screenshot containing multiple products.
+7. Add an analysed item to the tracker.
+8. Open **Tracker** and generate a weekly pattern analysis.
+9. Use the global **Ask** assistant or the week-level chat for a follow-up.
 
-The app remains navigable without `GEMINI_API_KEY`. Open **Scan** and choose any of the three clearly labeled examples:
-
-1. Pasteurized Greek yogurt with berries — generally suitable
-2. Large cold brew coffee — use caution
-3. Unpasteurized soft cheese — consider avoiding
-
-The Screenshot tab includes a seeded three-product shopping screenshot. On the Tracker page, choose **Load demo week**, then open the weekly summary and choose **View seeded demo summary**. Demo data is stored locally and clearly distinguished from live AI output.
+The Tracker includes an optional seeded sample week for demonstrations when no foods have been logged. Seeded content is clearly identified as demo data and is never presented as live Gemini output.
 
 ## API routes
 
 | Method | Route | Purpose |
 | --- | --- | --- |
-| `GET` | `/api/product/:barcode` | Open Food Facts product lookup |
-| `POST` | `/api/analyse/barcode` | Product and profile reasoning |
+| `GET` | `/api/product/:barcode` | Open Food Facts lookup with graceful sparse/unknown handling |
+| `POST` | `/api/analyse/barcode` | Product and pregnancy-context analysis |
 | `POST` | `/api/analyse/image` | Multimodal meal identification and analysis |
 | `POST` | `/api/analyse/screenshot` | Multi-product screenshot extraction and analysis |
-| `POST` | `/api/analyse/text` | Text food/ingredient analysis |
-| `POST` | `/api/chat` | Context-maintaining follow-up |
+| `POST` | `/api/analyse/text` | Food, ingredient, supplement, drink, or meal analysis |
+| `POST` | `/api/chat` | Follow-up conversation for a saved analysis |
+| `POST` | `/api/ask` | Global contextual assistant |
 | `POST` | `/api/weekly-summary` | Logged-food pattern synthesis |
+| `POST` | `/api/week-chat` | Follow-up conversation about the current week |
 
-Requests have input validation, payload limits, model timeouts, structured errors, and schema validation. The curated source knowledge base is in `src/data/guidance.json`.
+Routes include input validation, payload limits, timeouts, structured errors, JSON parsing, schema validation, and graceful model failure handling.
 
-## Chrome extension roadmap
+## Open Food Facts
 
-The screenshot endpoint is deliberately client-agnostic. A future Manifest V3 extension can:
+Open Food Facts does not require an API key. Barcode lookups are performed server-side and request product names, brands, ingredients, allergens, additives, labels, categories, serving size, images, nutrition facts, and record completeness.
 
-1. Capture the visible tab with `chrome.tabs.captureVisibleTab`.
-2. Send the data URL and the user’s BumpSafe profile to `/api/analyse/screenshot`.
-3. Use returned `locationInImage` metadata to associate identified Amazon products, groceries, or menu items with page elements.
-4. Render status badges in an isolated content-script overlay.
-5. Link each badge to a persisted full analysis in the web app.
+If Open Food Facts does not know a barcode, nutri.ai preserves the scan and returns an uncertainty-first report that recommends supplying a package photo or ingredient list.
 
-Production extension work would add authenticated cross-device profiles, extension origin controls, short-lived upload tokens, and stronger visual-to-DOM matching. It is intentionally not part of this hackathon MVP.
+## Browser extension
+
+The existing `extension/` directory contains the hackathon browser-extension proof of concept. It captures the visible tab, sends the image to the same screenshot-analysis endpoint, and links detected products back to the web app.
+
+The production roadmap would add:
+
+1. Authenticated cross-device profiles
+2. Extension-origin controls and short-lived upload tokens
+3. Stronger visual-to-DOM matching
+4. Inline status badges beside detected products
+5. Direct links to persisted full analyses
+
+The extension’s seeded fallback remains isolated from the live web MVP.
 
 ## Team
 
@@ -147,6 +215,6 @@ Production extension work would add authenticated cross-device profiles, extensi
 
 Repository: https://github.com/aarontran321/hackthevalley
 
-## Safety
+## Disclaimer
 
-BumpSafe never diagnoses a condition, recommends supplement dosages, advises stopping medication, makes absolute guarantees, or makes appearance/weight-loss recommendations. It uses calm uncertainty-aware language and directs individual or high-risk decisions to qualified healthcare professionals.
+> **nutri.ai provides educational information and is not medical advice.** Food safety and nutritional needs vary by person and pregnancy. Confirm important decisions with a qualified healthcare professional.

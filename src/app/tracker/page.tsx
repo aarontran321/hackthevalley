@@ -39,7 +39,7 @@ export default function TrackerPage() {
 
   return (
     <AppShell>
-      <main className="page container">
+      <main className="page container cohesive-page tracker-page">
         <section style={{ display: "flex", justifyContent: "space-between", gap: 18, alignItems: "end", flexWrap: "wrap", marginBottom: 25 }}>
           <div><div className="eyebrow">Consumption tracker</div><h1 className="title" style={{ margin: "9px 0 8px" }}>Your week, without judgment.</h1><p className="muted" style={{ margin: 0 }}>Notice patterns in what you’ve logged—not a scorecard of how you eat.</p></div>
           <div style={{ display: "flex", gap: 9 }}><Link href="/scan" className="btn btn-outline"><Plus size={18} /> Add food</Link>{entries.length > 0 && <Link href="/weekly-summary" className="btn btn-primary"><Sparkles size={18} /> Weekly summary</Link>}</div>
@@ -55,7 +55,7 @@ export default function TrackerPage() {
               <div className="eyebrow"><BarChart3 size={14} style={{ display: "inline", marginRight: 6 }} />Week at a glance</div>
               <div style={{ height: 230, marginTop: 20 }}><ResponsiveContainer width="100%" height="100%"><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ebe5dc" /><XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} /><YAxis hide allowDecimals={false} /><Tooltip cursor={{ fill: "#f4f0e8" }} /><Bar dataKey="foods" fill="#789582" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer></div>
             </div>
-            <div className="card card-pad" style={{ background: "var(--lavender)" }}><div className="eyebrow">Nutrient-pattern preview</div><h2 style={{ margin: "9px 0" }}>What’s showing up in your log</h2><p className="muted" style={{ lineHeight: 1.6 }}>Your available entries include {entries.filter(e => (e.estimatedNutrients?.protein || 0) > 10).length} identifiable protein-rich choices and {entries.filter(e => (e.estimatedNutrients?.calcium || 0) > 100).length} calcium-containing choices. These are estimates from logged items only.</p><Link href="/weekly-summary" className="btn btn-primary"><Sparkles size={18} /> Generate full pattern analysis</Link></div>
+            <div className="card card-pad editorial-accent"><div className="eyebrow">Nutrient-pattern preview</div><h2 style={{ margin: "9px 0" }}>What’s showing up in your log</h2><p className="muted" style={{ lineHeight: 1.6 }}>Your available entries include {entries.filter(e => (e.estimatedNutrients?.protein || 0) > 10).length} identifiable protein-rich choices and {entries.filter(e => (e.estimatedNutrients?.calcium || 0) > 100).length} calcium-containing choices. These are estimates from logged items only.</p><Link href="/weekly-summary" className="btn btn-primary"><Sparkles size={18} /> Generate full pattern analysis</Link></div>
           </section>
           <WeekJudgement entries={entries} summary={summary} onSummary={setSummary} />
           <WeekChat entries={entries} summary={summary} />

@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Barcode, Camera, ImageIcon, Keyboard, LoaderCircle, PlayCircle, ScanLine, Sparkles } from "lucide-react";
+import { Barcode, Camera, ImageIcon, Keyboard, LoaderCircle, ScanLine, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FileUpload } from "@/components/file-upload";
 import { BarcodeCamera } from "@/components/barcode-camera";
@@ -10,7 +10,6 @@ import { FoodCamera } from "@/components/food-camera";
 import { StatusBadge } from "@/components/icons";
 import { apiPost, imageToDataUrl } from "@/lib/client-api";
 import { storage } from "@/lib/storage";
-import { demoScreenshotItems } from "@/data/demo";
 import type { FoodAnalysis, ScreenshotItem } from "@/types";
 
 type Mode = "barcode" | "photo" | "screenshot" | "text";
@@ -79,46 +78,43 @@ export default function ScanPage() {
     } catch (e) { handleError(e); }
   };
 
-  const loadScreenshotDemo = () => {
-    setError(""); setPreview("/demo-shopping.svg"); setScreenshotItems(demoScreenshotItems); setLoading("");
-  };
-
   return (
     <AppShell>
-      <main className="page container">
-        <div style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 30px" }}>
+      <main className="page container cohesive-page scan-page">
+        <div className="page-intro">
           <div className="eyebrow"><Sparkles size={14} style={{ display: "inline", marginRight: 6 }} />Your food, in context</div>
           <h1 className="title" style={{ margin: "9px 0 12px" }}>What would you like to check?</h1>
           <p className="subtitle" style={{ margin: 0 }}>We’ll combine what’s visible with your pregnancy profile and curated public-health guidance.</p>
         </div>
-        <div className="card" style={{ maxWidth: 900, margin: "0 auto", overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", borderBottom: "1px solid var(--line)", overflowX: "auto" }}>
-            {tabs.map(({ id, label, icon: Icon }) => <button type="button" key={id} onClick={() => { setMode(id); setError(""); setPreview(""); setScreenshotItems([]); setFoodCamera(false); }} style={{ minWidth: 130, padding: "18px 10px", border: 0, borderBottom: mode === id ? "3px solid var(--ink)" : "3px solid transparent", background: mode === id ? "#f5f1e9" : "transparent", cursor: "pointer", fontWeight: 750 }}><Icon size={18} style={{ verticalAlign: "middle", marginRight: 7 }} />{label}</button>)}
+        <div className="card scan-console">
+          <div className="scan-tabs">
+            {tabs.map(({ id, label, icon: Icon }) => <button type="button" key={id} className={mode === id ? "is-active" : ""} onClick={() => { setMode(id); setError(""); setPreview(""); setScreenshotItems([]); setFoodCamera(false); }}><Icon size={18} />{label}</button>)}
           </div>
           <div className="card-pad" style={{ minHeight: 340 }}>
-            {mode === "barcode" && <div>
+            {mode === "barcode" && <div className="scan-mode-panel scan-mode-barcode">
               <h2 style={{ marginTop: 0 }}>Scan a packaged product</h2>
               <p className="muted">Use your camera or enter the digits printed beneath the barcode.</p>
-              {camera && <div style={{ margin: "20px 0" }}><BarcodeCamera onDetected={(code) => { setBarcode(code); analyseBarcode(code); }} onClose={() => setCamera(false)} /></div>}
+              {camera && <div className="scan-camera-wrap" style={{ margin: "20px 0" }}><BarcodeCamera onDetected={(code) => { setBarcode(code); analyseBarcode(code); }} onClose={() => setCamera(false)} /></div>}
               {!camera && <button className="btn btn-soft" type="button" onClick={() => setCamera(true)}><ScanLine size={18} /> Open camera scanner</button>}
-              <div style={{ display: "flex", gap: 10, alignItems: "end", marginTop: 24, maxWidth: 570 }}>
+              {!camera && <div className="scan-divider"><span>or enter manually</span></div>}
+              <div className="barcode-manual" style={{ display: "flex", gap: 10, alignItems: "end", maxWidth: 570 }}>
                 <label style={{ flex: 1 }}><span className="label">Barcode number</span><input className="input" inputMode="numeric" placeholder="e.g. 3017620422003" value={barcode} onChange={(e) => setBarcode(e.target.value.replace(/\D/g, ""))} /></label>
                 <button className="btn btn-primary" disabled={barcode.length < 8 || !!loading} onClick={() => analyseBarcode()}>{loading ? <LoaderCircle className="spin" size={18} /> : "Look up"}</button>
               </div>
             </div>}
-            {mode === "photo" && <div>
+            {mode === "photo" && <div className="scan-mode-panel scan-mode-photo">
               <h2 style={{ marginTop: 0 }}>Photograph a food or meal</h2>
               <p className="muted">Useful for restaurant meals, deli items, produce, and products without readable packaging.</p>
-              {foodCamera && <div style={{ margin: "20px 0" }}><FoodCamera onCapture={(file) => analyseImage(file, false)} onClose={() => setFoodCamera(false)} /></div>}
+              {foodCamera && <div className="scan-camera-wrap" style={{ margin: "20px 0" }}><FoodCamera onCapture={(file) => analyseImage(file, false)} onClose={() => setFoodCamera(false)} /></div>}
               {!foodCamera && <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 22 }}><button type="button" className="btn btn-outline" onClick={() => setFoodCamera(true)}><Camera size={18} /> Take a photo</button><FileUpload onFile={(file) => analyseImage(file, false)} label="Upload image" /></div>}
             </div>}
-            {mode === "screenshot" && <div>
+            {mode === "screenshot" && <div className="scan-mode-panel scan-mode-screenshot">
               <h2 style={{ marginTop: 0 }}>Analyse an online shopping screen</h2>
               <p className="muted">Gemini will extract each visible food or menu item, then show a separate pregnancy-aware result.</p>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 22 }}><FileUpload onFile={(file) => analyseImage(file, true)} label="Upload screenshot" /><button type="button" className="btn btn-soft" onClick={loadScreenshotDemo}><PlayCircle size={18} /> Try demo screenshot</button></div>
-              <p style={{ fontSize: 12, color: "var(--muted)" }}>Proof of concept for a future browser extension. The demo is seeded data, not live Gemini output.</p>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 22 }}><FileUpload onFile={(file) => analyseImage(file, true)} label="Upload screenshot" /></div>
+              <p style={{ fontSize: 12, color: "var(--muted)" }}>Proof of concept for a future browser extension using the same live Gemini analysis flow.</p>
             </div>}
-            {mode === "text" && <div>
+            {mode === "text" && <div className="scan-mode-panel scan-mode-text">
               <h2 style={{ marginTop: 0 }}>Search by food, ingredient, or meal</h2>
               <p className="muted">Include preparation details or a brand when you know them—the more context, the better.</p>
               <label style={{ display: "block", maxWidth: 650, marginTop: 22 }}><span className="label">What would you like to check?</span><textarea className="input" rows={4} placeholder="e.g. eggs Benedict with runny poached eggs at a restaurant" value={query} onChange={(e) => setQuery(e.target.value)} /></label>

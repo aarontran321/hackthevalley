@@ -75,7 +75,7 @@ const TOOLS: FunctionDeclaration[] = [
 function systemInstruction(profile: UserProfile, trimester: Trimester): string {
   const conditions = profile.healthConditions ?? [];
   return `
-You are the assistant inside BumpSafe, a pregnancy food-safety tool. The person
+You are the assistant inside nutri.ai, a pregnancy food-safety tool. The person
 you are talking to is pregnant, currently week ${profile.pregnancyWeek}, trimester ${trimester}.
 ${profile.babies === "twins" ? "They are carrying twins." : profile.babies === "three_plus" ? "They are carrying three or more babies." : ""}
 ${profile.age ? `They are ${profile.age}.` : ""}
@@ -89,7 +89,7 @@ You already know their week and conditions — never ask again.
   knowledge. Call check_food_by_name first and answer from what it returns.
 - When they ask what they *can* eat, check two or three concrete options and
   recommend the ones that came back clean. A no-match is useful news, not a
-  dead end: say the food isn't flagged by any guideline BumpSafe checks and
+  dead end: say the food isn't flagged by any guideline nutri.ai checks and
   offer it. Only suggest scanning if they asked about a specific packaged
   product, or if a rule matched and preparation is what decides it.
 - Answer the craving they actually described — salty, sweet, cold, crunchy —

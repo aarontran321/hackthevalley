@@ -70,7 +70,7 @@ export function FoodCamera({
       (blob) => {
         if (!blob) return;
         streamRef.current?.getTracks().forEach((track) => track.stop());
-        onCapture(new File([blob], `bumpsafe-food-${Date.now()}.jpg`, { type: "image/jpeg" }));
+        onCapture(new File([blob], `nutri-ai-food-${Date.now()}.jpg`, { type: "image/jpeg" }));
       },
       "image/jpeg",
       0.9,

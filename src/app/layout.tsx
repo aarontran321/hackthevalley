@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BumpSafe — Pregnancy-aware food guidance",
+  title: "nutri.ai — Pregnancy-aware food guidance",
   description: "Calm, personalized pregnancy food guidance grounded in trusted public-health sources."
 };
 

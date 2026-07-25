@@ -167,12 +167,12 @@ export function AskPanel() {
         className={`ask-panel${open ? " is-open" : ""}`}
         role="dialog"
         aria-modal="true"
-        aria-label="Ask BumpSafe"
-        {...(!open ? { inert: "" as unknown as boolean } : {})}
+        aria-label="Ask nutri.ai"
+        inert={!open}
       >
         <header className="ask-head">
           <div>
-            <strong>Ask BumpSafe</strong>
+            <strong>Ask nutri.ai</strong>
             <p className="muted" style={{ margin: 0, fontSize: 13 }}>
               Checks the rules before it answers.
             </p>

@@ -215,7 +215,7 @@ export default function ProfilePage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `bumpsafe-data-${new Date().toISOString().slice(0, 10)}.json`;
+    link.download = `nutri-ai-data-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -243,13 +243,13 @@ export default function ProfilePage() {
 
   return (
     <AppShell>
-      <main className="page container">
+      <main className="page container cohesive-page profile-page">
         <div style={{ maxWidth: 750, margin: "0 auto" }}>
           <div className="eyebrow">Your context</div>
           <h1 className="title" style={{ margin: "10px 0 12px" }}>Guidance that starts with you.</h1>
           <p className="subtitle" style={{ margin: "0 0 28px" }}>These details personalize educational guidance. They stay in this browser for the MVP and are not used to diagnose or assess your weight.</p>
 
-          <section className="card card-pad" style={{ background: "#e7dfe0", marginBottom: 20 }}>
+          <section className="card card-pad editorial-accent" style={{ marginBottom: 20 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span style={{ width: 54, height: 54, display: "grid", placeItems: "center", background: "rgba(255,255,255,.6)", borderRadius: 18, fontFamily: "Georgia,serif", fontSize: 24 }}>
@@ -334,7 +334,7 @@ export default function ProfilePage() {
             )}
           </section>
 
-          <form onSubmit={submit} className="card card-pad">
+          <form onSubmit={submit} className="card card-pad profile-form">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 20 }}>
               <div>
                 <div className="eyebrow">Personal information</div>
@@ -517,7 +517,7 @@ export default function ProfilePage() {
           <section className="card card-pad" style={{ marginTop: 20 }}>
             <div className="eyebrow">Your data</div>
             <h2 style={{ margin: "7px 0 9px" }}>Everything stays in this browser</h2>
-            <p className="muted" style={{ margin: "0 0 20px", lineHeight: 1.6 }}>BumpSafe stores your profile and food history in this browser only, so clearing site data removes it. Export a copy before switching devices.</p>
+            <p className="muted" style={{ margin: "0 0 20px", lineHeight: 1.6 }}>nutri.ai stores your profile and food history in this browser only, so clearing site data removes it. Export a copy before switching devices.</p>
             <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
               <button type="button" className="btn btn-outline" onClick={exportData} style={{ minHeight: 42, paddingInline: 16 }}><Download size={16} /> Export my data</button>
               <button type="button" className="btn btn-outline" onClick={clearActivity} style={{ minHeight: 42, paddingInline: 16 }}><UtensilsCrossed size={16} /> Clear food history</button>

@@ -57,11 +57,18 @@ const allSourcesText = GUIDELINES.map(
  * model a small cross-authority baseline covering nutrition, produce safety,
  * allergens, and handling. This is not permission to infer beyond the corpus.
  */
-const TEXT_SEARCH_BASELINE_IDS = [
+const GENERAL_ANALYSIS_BASELINE_IDS = [
   "ACOG-NUTRITION-01",
   "CDC-SAFERFOOD-2025",
   "FDA-ALLERGIES-2025",
   "HC-SAFEFOOD-2025",
+  "NHS-GDM-2023",
+  "ACOG-CAFFEINE-2010",
+  "FDA-LISTERIA-2022",
+  "CDC-ALCOHOL-2026",
+  "FDA-SWEETENERS-2025",
+  "FDA-ADDEDSUGAR-2025",
+  "NHS-SWEETENERS-2023",
 ];
 
 const analysisResponseSchema = {
@@ -84,7 +91,7 @@ const analysisResponseSchema = {
   }
 };
 
-const system = `You are BumpSafe's calm educational reasoning layer. You do not diagnose, prescribe, recommend supplement doses, or make absolute safety guarantees. Base medical and food-safety claims ONLY on the supplied source summaries. Cite ONLY supplied source IDs — never invent one. If no supplied source supports a conclusion, use insufficient_information. If a deterministic pre-check assigned a status, you may raise its severity but never lower it. Clearly identify uncertainty in limitations. Personalize to the provided pregnancy week, conditions, allergies, and preferences without weight-loss or appearance advice.`;
+const system = `You are nutri.ai's calm educational reasoning layer. You do not diagnose, prescribe, recommend supplement doses, or make absolute safety guarantees. Base medical and food-safety claims ONLY on the supplied source summaries. Cite ONLY supplied source IDs — never invent one. If no supplied source supports a conclusion, use insufficient_information. If a deterministic pre-check assigned a status, you may raise its severity but never lower it. Clearly identify uncertainty in limitations. Personalize to the provided pregnancy week, conditions, allergies, and preferences without weight-loss or appearance advice.`;
 
 const parseDataUrl = (dataUrl: string) => {
   const match = dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/);
@@ -176,24 +183,18 @@ export async function analyseItem(input: {
   const item = toFoodItem(input.item);
   const matches = runRules(item, { trimester, conditions });
   const retrievedGuidelines = retrieveGuidelines(item, matches, { conditions });
-  const guidelines =
-    input.mode === "text" && retrievedGuidelines.length === 0
-      ? TEXT_SEARCH_BASELINE_IDS
-          .map((id) => GUIDELINE_BY_ID.get(id))
-          .filter((guideline): guideline is NonNullable<typeof guideline> => Boolean(guideline))
-      : retrievedGuidelines;
-
-  // Nothing retrieved and no rule fired: no hazard document could apply, so
-  // answer deterministically rather than inviting the model to reach for one.
-  // A photo still goes to the model, because the ingredients aren't known yet.
-  if (guidelines.length === 0 && matches.length === 0 && !input.imageDataUrl) {
-    return fallbackAnalysis(
-      item,
-      matches,
-      profile,
-      "No guideline in the corpus applies to these ingredients.",
-    );
-  }
+  // Every named or scanned item reaches Gemini. Broad baseline documents give
+  // sparse catalogue records useful pregnancy context without allowing the
+  // model to invent an ingredient list.
+  const baselineGuidelines = GENERAL_ANALYSIS_BASELINE_IDS
+    .map((id) => GUIDELINE_BY_ID.get(id))
+    .filter((guideline): guideline is NonNullable<typeof guideline> => Boolean(guideline));
+  const guidelines = [
+    ...retrievedGuidelines,
+    ...baselineGuidelines.filter(
+      (baseline) => !retrievedGuidelines.some((retrieved) => retrieved.id === baseline.id),
+    ),
+  ].slice(0, 12);
 
   // --- Layer 2: the model explains which of those guidelines apply.
   let parsed: FoodAnalysis;
@@ -216,7 +217,9 @@ export async function analyseItem(input: {
             ? `For the image, first identify the likely item, visible ingredients and preparation, and reflect uncertainty in limitations and confidence.`
             : input.mode === "text"
               ? `Interpret the user's named food or meal literally. Give a useful item-specific report using only the supplied guidance. If preparation, pasteurization, portion, allergens, or ingredients are unknown, state that uncertainty rather than treating the item as unidentified.`
-              : `Return the requested structured analysis.`,
+              : input.mode === "barcode"
+                ? `Write an item-specific report even when catalogue data is sparse. Use the product name, categories, labels, ingredients, allergens, additives and nutrition fields that are present. Never invent missing product facts. If the record is unidentified, explain exactly what packaging detail is needed and return insufficient_information.`
+                : `Return the requested structured analysis.`,
         ].join("\n"),
       },
     ];

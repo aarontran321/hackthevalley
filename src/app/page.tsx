@@ -5,8 +5,8 @@ import { AppShell } from "@/components/app-shell";
 export default function Landing() {
   return (
     <AppShell>
-      <main>
-        <section className="container" style={{ minHeight: "calc(100vh - 142px)", display: "grid", gridTemplateColumns: "1.08fr .92fr", gap: 54, alignItems: "center", paddingBlock: 60 }}>
+      <main className="landing-page">
+        <section className="container landing-hero" style={{ minHeight: "calc(100vh - 142px)", display: "grid", gridTemplateColumns: "1.08fr .92fr", gap: 54, alignItems: "center", paddingBlock: 60 }}>
           <div className="fade-up">
             <div className="eyebrow" style={{ marginBottom: 20 }}><Sparkles size={14} style={{ display: "inline", marginRight: 7 }} />Pregnancy-aware food guidance</div>
             <h1 className="display" style={{ margin: 0, maxWidth: 720 }}>Know what’s on your plate, <i style={{ color: "#8d6d71", fontWeight: 400 }}>and why it matters.</i></h1>
@@ -21,8 +21,8 @@ export default function Landing() {
               <span><CheckCircle2 size={15} style={{ display: "inline", color: "#4d775d", marginRight: 6 }} />Calm, clear language</span>
             </div>
           </div>
-          <div className="card fade-up" style={{ padding: 22, position: "relative", overflow: "hidden", background: "#e7dfe0" }}>
-            <div style={{ background: "rgba(255,253,249,.92)", borderRadius: 20, padding: 24, margin: "34px 12px" }}>
+          <div className="card fade-up landing-result" style={{ padding: 22, position: "relative", overflow: "hidden" }}>
+            <div className="landing-result-paper" style={{ padding: 24, margin: "34px 12px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 10 }}>
                 <div><div className="eyebrow">Just analysed</div><h3 style={{ margin: "8px 0", fontSize: 23 }}>Imported soft cheese</h3></div>
                 <span className="status status-caution">△ Use caution</span>
@@ -35,7 +35,7 @@ export default function Landing() {
             </div>
           </div>
         </section>
-        <section style={{ background: "#f1eee7", padding: "75px 0" }}>
+        <section className="landing-features" style={{ padding: "75px 0" }}>
           <div className="container">
             <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 35px" }}><div className="eyebrow">One place, every format</div><h2 className="title" style={{ margin: "12px 0" }}>From kitchen counter to checkout screen.</h2></div>
             <div className="grid-3">
