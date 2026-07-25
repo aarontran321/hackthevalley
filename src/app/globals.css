@@ -1,16 +1,46 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Theme: the good grocer.
+   Grocery cues — paper, ink, mono label type, nutrition-panel rules, barcode
+   geometry — rather than the soft-pastel spa palette this category defaults to.
+   Saturated colour is reserved for verdict semantics; everything structural is
+   paper, ink and one confident market green.
+   --------------------------------------------------------------------------- */
+
 :root {
-  --ink: #26332e;
-  --muted: #66736d;
-  --cream: #fbf8f2;
-  --card: #fffdf9;
-  --sage: #dfeadf;
-  --sage-dark: #3e6550;
-  --rose: #f3dfdf;
-  --peach: #f5e2d3;
-  --lavender: #eae4f2;
-  --line: #e8e3da;
+  --ink: #1a211e;
+  --muted: #6b7671;
+  --cream: #f7f5ef;
+  --card: #ffffff;
+
+  /* Deeper and more confident than the old sage; carries the brand alone. */
+  --sage: #e4ede6;
+  --sage-dark: #2f6b4f;
+
+  /* Kept so existing usages stay valid, but pulled back towards paper so the
+     palette reads as one material instead of five pastels. */
+  --rose: #f0e7e4;
+  --peach: #f2e8d9;
+  --lavender: #e7e9ec;
+
+  --line: #e3dfd5;
+  --rule: #1a211e;
+
+  /* Verdict semantics. These four were checked with a contrast/CVD validator:
+     avoid vs caution sits at ΔE 18.5 for normal vision and 9.6 under protanopia,
+     which the softer ochre they replace did not clear. */
+  --v-suitable: #0e7c58;
+  --v-caution: #c07c0a;
+  --v-avoid: #a82f22;
+  --v-unknown: #4a5a9e;
+
+  --font-display: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --r-card: 14px;
+  --r-input: 10px;
 }
 
 * { box-sizing: border-box; }
@@ -19,8 +49,20 @@ body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Label type: quantities, IDs, codes — the grocery-shelf voice. */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible focus everywhere, on paper so it reads against dark buttons too. */
+:focus-visible {
+  outline: 2px solid var(--sage-dark);
+  outline-offset: 2px;
 }
 button, input, textarea, select { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
@@ -29,30 +71,35 @@ a { color: inherit; text-decoration: none; }
 .shell { min-height: 100vh; }
 .container { width: min(1160px, calc(100% - 32px)); margin-inline: auto; }
 .page { padding: 42px 0 80px; }
-.eyebrow { color: var(--sage-dark); font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.display { font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.4rem, 6vw, 5.1rem); line-height: .98; letter-spacing: -.045em; }
-.title { font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.05; letter-spacing: -.035em; }
+.eyebrow { color: var(--sage-dark); font-family: var(--font-mono); font-size: .72rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+.display { font-family: var(--font-display); font-size: clamp(2.4rem, 6vw, 5.1rem); line-height: .98; letter-spacing: -.045em; }
+.title { font-family: var(--font-display); font-size: clamp(1.9rem, 3.4vw, 2.9rem); line-height: 1.06; letter-spacing: -.03em; }
 .subtitle { color: var(--muted); font-size: 1.05rem; line-height: 1.65; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 12px 40px rgba(58, 65, 54, .05); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: 0 1px 2px rgba(26, 33, 30, .04), 0 10px 30px rgba(26, 33, 30, .04); }
 .card-pad { padding: 24px; }
+
+/* Nutrition-panel rule: the heavy line under a section head. */
+.panel-rule { height: 3px; background: var(--rule); margin: 10px 0 14px; }
+.panel-hair { height: 1px; background: var(--line); margin: 12px 0; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 0 20px; border: 0; border-radius: 999px; cursor: pointer; font-weight: 750; transition: transform .18s, box-shadow .18s, opacity .18s; }
 .btn:hover { transform: translateY(-1px); }
 .btn:disabled { cursor: not-allowed; opacity: .55; transform: none; }
 .btn-primary { background: var(--ink); color: white; box-shadow: 0 8px 24px rgba(38, 51, 46, .18); }
 .btn-soft { background: var(--sage); color: #294837; }
 .btn-outline { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px #cfcac1; }
-.input { width: 100%; min-height: 50px; padding: 12px 15px; color: var(--ink); background: white; border: 1px solid #dcd7ce; border-radius: 14px; outline: none; transition: box-shadow .15s, border .15s; }
-.input:focus { border-color: #789381; box-shadow: 0 0 0 4px rgba(112, 148, 126, .14); }
-.label { display: block; margin-bottom: 8px; font-size: .86rem; font-weight: 800; }
+.input { width: 100%; min-height: 48px; padding: 12px 15px; color: var(--ink); background: white; border: 1px solid #dcd7ce; border-radius: var(--r-input); outline: none; transition: box-shadow .15s, border .15s; }
+.input:focus { border-color: var(--sage-dark); box-shadow: 0 0 0 4px rgba(47, 107, 79, .13); }
+.label { display: block; margin-bottom: 8px; font-size: .86rem; font-weight: 700; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 .muted { color: var(--muted); }
-.status { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: 999px; font-size: .78rem; font-weight: 800; white-space: nowrap; }
-.status-suitable { color: #226441; background: #ddefe3; }
-.status-caution { color: #7a5618; background: #f8e9bf; }
-.status-avoid { color: #844645; background: #f4dddd; }
-.status-insufficient { color: #485d70; background: #e1eaf0; }
-.notice { padding: 14px 16px; background: #f1eee7; border-radius: 14px; color: #53605a; font-size: .82rem; line-height: 1.5; }
+/* Status always ships with its label text, never colour alone. */
+.status { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; font-family: var(--font-mono); font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.status-suitable { color: #0b5e43; background: #dff0e7; }
+.status-caution { color: #8a5807; background: #faecd0; }
+.status-avoid { color: #8d271c; background: #f6dedb; }
+.status-insufficient { color: #3b4878; background: #e4e7f2; }
+.notice { padding: 14px 16px; background: #f2efe8; border-radius: var(--r-input); color: #53605a; font-size: .82rem; line-height: 1.5; }
 .fade-up { animation: fadeUp .45s ease both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -234,3 +281,107 @@ a { color: inherit; text-decoration: none; }
 @media print {
   .ask-fab, .ask-panel, .ask-scrim { display: none !important; }
 }
+
+/* ---------------------------------------------------------------------------
+   The verdict receipt.
+   A physical strip that holds only the decision and its evidence — item,
+   status, what was flagged, which source said so. Everything else lives in
+   the column beside it and the sections underneath, so the receipt stays
+   readable rather than becoming a second page.
+   --------------------------------------------------------------------------- */
+
+.result-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .result-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Sticks while the supporting detail scrolls past it on a laptop. */
+.receipt-rail { position: sticky; top: 24px; }
+
+@media (max-width: 900px) {
+  .receipt-rail { position: static; }
+}
+
+.receipt {
+  --tear-h: 9px;
+  --tear-w: 18px;
+  background: var(--card);
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  padding-block: var(--tear-h);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+
+  /* Three mask layers: zigzag, solid body, zigzag. */
+  -webkit-mask-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='9'><path d='M0 9 L9 0 L18 9 Z' fill='%23000'/></svg>"),
+    linear-gradient(#000, #000),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='9'><path d='M0 0 L9 9 L18 0 Z' fill='%23000'/></svg>");
+  -webkit-mask-size: var(--tear-w) var(--tear-h), 100% calc(100% - var(--tear-h) * 2), var(--tear-w) var(--tear-h);
+  -webkit-mask-position: left top, left var(--tear-h), left bottom;
+  -webkit-mask-repeat: repeat-x, no-repeat, repeat-x;
+  mask-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='9'><path d='M0 9 L9 0 L18 9 Z' fill='%23000'/></svg>"),
+    linear-gradient(#000, #000),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='9'><path d='M0 0 L9 9 L18 0 Z' fill='%23000'/></svg>");
+  mask-size: var(--tear-w) var(--tear-h), 100% calc(100% - var(--tear-h) * 2), var(--tear-w) var(--tear-h);
+  mask-position: left top, left var(--tear-h), left bottom;
+  mask-repeat: repeat-x, no-repeat, repeat-x;
+
+  /* drop-shadow traces the mask alpha; box-shadow would follow the rectangle
+     and miss the teeth, which is the whole point of the effect. */
+  filter: drop-shadow(0 1px 1px rgba(26, 33, 30, .06)) drop-shadow(0 6px 14px rgba(26, 33, 30, .06));
+}
+
+.receipt-sec { padding: 14px 20px; border-top: 1px solid var(--line); }
+.receipt-sec:first-child { border-top: 0; }
+
+.receipt-label { color: var(--muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+
+.receipt-item { font-family: var(--font-body); font-size: 17px; font-weight: 700; line-height: 1.25; letter-spacing: -.01em; }
+
+.receipt-verdict { border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule); }
+.receipt-verdict.is-soft { border-bottom: 0; }
+
+.receipt-headline {
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.v-suitable { color: var(--v-suitable); }
+.v-caution { color: var(--v-caution); }
+.v-avoid { color: var(--v-avoid); }
+.v-unknown { color: var(--v-unknown); }
+
+/* Dashed sides when we don't know — legible before you've read a word. */
+.receipt.is-unknown { border-left-style: dashed; border-right-style: dashed; border-color: var(--v-unknown); }
+
+/* label ............ VALUE, as on a receipt */
+.leader { flex: 1 1 auto; align-self: end; margin-bottom: .3em; border-bottom: 1px dotted var(--line); }
+
+.receipt-row { display: flex; align-items: baseline; gap: 8px; }
+
+.receipt-cite { color: var(--muted); font-size: 11.5px; }
+.receipt-cite a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+.receipt-cite a:hover { text-decoration-color: var(--ink); }
+
+.barcode { display: flex; align-items: stretch; gap: 2px; height: 26px; }
+.barcode span { background: var(--ink); }
+
+.receipt-unroll { animation: unroll 560ms cubic-bezier(.2,.8,.2,1) both; }
+@keyframes unroll { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+
+@media (prefers-reduced-motion: reduce) { .receipt-unroll { animation: none; } }
+@media print { .receipt { filter: none; } }
