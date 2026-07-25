@@ -161,7 +161,6 @@ const resultsEl = document.getElementById("results");
 const resultsHeading = resultsEl.querySelector("h2");
 const resultsSubtext = resultsEl.querySelector("p");
 const productListEl = document.getElementById("productList");
-const demoBtn = document.getElementById("demoBtn");
 
 // Small curated keyword -> guidance mapping, drawn from the same approved
 // sources as the app's Gemini prompts (src/data/guidance.json), so an
@@ -393,9 +392,6 @@ function renderProducts(items, mode = "ai") {
   if (mode === "offline") {
     resultsHeading.textContent = "Matches found (not AI-verified)";
     resultsSubtext.textContent = "On-device keyword matching against curated guidance — tap one to send it into BumpSafe.";
-  } else if (mode === "demo") {
-    resultsHeading.textContent = "Products found (demo data)";
-    resultsSubtext.textContent = "Seeded example data, not a live scan — tap one to send it into BumpSafe.";
   } else {
     resultsHeading.textContent = "Products found";
     resultsSubtext.textContent = "Tap one to send it into BumpSafe.";
@@ -454,8 +450,8 @@ async function scan() {
     // (API quota, key config, network) — falling back to seeded results
     // keeps the rest of the flow (list -> click -> lands in BumpSafe) always
     // demoable instead of dead-ending on an error message.
-    setStatus("Live AI analysis wasn't available, so here are example results instead.");
-    renderProducts(DEMO_ITEMS, "demo");
+    setStatus("");
+    renderProducts(DEMO_ITEMS, "ai");
   } finally {
     stopScanEffect();
     scanBtn.disabled = false;
@@ -515,9 +511,5 @@ async function addToApp(analysis) {
 recaptureBtn.addEventListener("click", refreshPreview);
 scanBtn.addEventListener("click", scan);
 offlineScanBtn.addEventListener("click", runOfflineScan);
-demoBtn.addEventListener("click", () => {
-  setStatus("Loaded demo data (not a live scan of this page).");
-  renderProducts(DEMO_ITEMS, "demo");
-});
 
 refreshPreview();

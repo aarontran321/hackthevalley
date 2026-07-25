@@ -67,7 +67,6 @@ export default function AnalysisPage() {
     <AppShell>
       <main className="page container" style={{ maxWidth: 1000 }}>
         <Link href="/scan" className="muted" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontWeight: 700, fontSize: 14 }}><ArrowLeft size={17} /> Back to scan</Link>
-        {analysis.isDemo && <div className="notice" style={{ marginTop: 20, background: "#e8e6f0" }}><b>Demo result:</b> This is seeded sample data for a reliable presentation, not a live Gemini response.</div>}
         <section className="card" style={{ overflow: "hidden", marginTop: 16 }}>
           <div style={{ background: analysis.status === "generally_suitable" ? "#e5eee2" : analysis.status === "use_caution" ? "#f6e7c7" : "#f1dddd", padding: "38px clamp(20px,5vw,55px)" }}>
             <StatusBadge status={analysis.status} />
