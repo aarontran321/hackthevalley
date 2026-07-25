@@ -1,50 +1,29 @@
 import { Receipt } from "@/components/Receipt";
-import type { Verdict } from "@/lib/types";
+import { DEMO_VERDICTS } from "@/lib/demo";
+import { resolveGuidelineUrl } from "@/lib/guidelines";
 
 /**
- * M1 stop condition: a deployed URL shows a verdict from fake data.
- * This hardcoded object is replaced by /api/verdict in M3.
+ * M2 scaffold view: the four severity states rendered from `?demo=1` seed data
+ * with live citations. Replaced by the real setup -> scan -> verdict flow in M4;
+ * until then this is how the receipt gets iterated without burning API calls.
  */
-const FIXTURE: Verdict = {
-  item: {
-    name: "Deli Turkey Breast",
-    brand: "Hillshire Farm",
-    ingredients: [
-      "turkey breast",
-      "water",
-      "salt",
-      "sodium phosphate",
-      "sodium diacetate",
-      "sodium erythorbate",
-      "sodium nitrite",
-    ],
-    nutrition: { sodium_mg: 720, protein_g: 12, fat_g: 1.5, carbs_g: 2 },
-  },
-  severity: "AVOID",
-  headline: "Avoid this one",
-  reasoning:
-    "Ready-to-eat deli meat can carry listeria, which crosses the placenta even when you feel fine. Heating it to steaming kills the bacteria. Cold from the package, it's not worth the risk.",
-  flags: [
-    {
-      ingredient: "ready-to-eat deli meat",
-      severity: "AVOID",
-      plainReason: "Listeria risk unless heated until steaming hot.",
-      guidelineIds: ["FDA-LISTERIA-2022"],
-    },
-  ],
-  alternatives: [
-    { name: "Rotisserie chicken, sliced warm", why: "same savory, served hot" },
-    { name: "Canned salmon salad", why: "salty and cold-ready, fully cooked" },
-    { name: "Aged hard cheese + crackers", why: "salt and bite, no soft cheese" },
-  ],
-  modelConfidence: 0.91,
-  ruleTriggered: true,
-};
-
 export default function Home() {
   return (
-    <div className="px-5 py-8">
-      <Receipt verdict={FIXTURE} week={22} />
+    <div className="space-y-10 px-5 py-8">
+      {Object.entries(DEMO_VERDICTS).map(([barcode, verdict]) => (
+        <section key={barcode}>
+          <p className="mx-auto mb-2 w-full max-w-[420px] font-mono text-xs tracking-[0.16em] text-graphite">
+            {verdict.severity}
+            {verdict.ruleTriggered ? " · rule-matched" : ""}
+          </p>
+          <Receipt
+            verdict={verdict}
+            week={22}
+            barcode={barcode === "0000000000000" ? undefined : barcode}
+            resolveGuidelineUrl={resolveGuidelineUrl}
+          />
+        </section>
+      ))}
     </div>
   );
 }

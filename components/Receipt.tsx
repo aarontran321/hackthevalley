@@ -33,7 +33,7 @@ const SEVERITY_STYLES: Record<Severity, SeverityStyle> = {
 
 /** Deterministic bars from the code string — stable across server and client. */
 function Barcode({ code }: { code: string }) {
-  const digits = code.padEnd(12, "0").slice(0, 12);
+  const digits = code.replace(/\D/g, "") || "0";
   const bars = Array.from({ length: 46 }, (_, i) => {
     const seed = digits.charCodeAt(i % digits.length) + i * 7;
     return (seed % 3) + 1;
@@ -68,32 +68,44 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function Receipt({
   verdict,
   week,
+  barcode,
   resolveGuidelineUrl,
 }: {
   verdict: Verdict;
   week: number;
-  /** M2 wires this to the guideline corpus; until then IDs render as plain text. */
+  /** Scanned code, if there was one. The photo path has no barcode. */
+  barcode?: string;
   resolveGuidelineUrl?: (id: string) => string | undefined;
 }) {
   const style = SEVERITY_STYLES[verdict.severity];
   const trimester = week <= 13 ? 1 : week <= 27 ? 2 : 3;
   const lowConfidence = verdict.modelConfidence < LOW_CONFIDENCE_THRESHOLD;
+  const hasNutrition = Object.keys(verdict.item.nutrition).length > 0;
 
   return (
     <article
       className={`mx-auto w-full max-w-[420px] border bg-white ${style.strip}`}
     >
-      <Barcode code={verdict.item.brand ? "049000041" : "000000000"} />
+      {barcode ? (
+        <Barcode code={barcode} />
+      ) : (
+        // The photo path has nothing to render a barcode from; say so rather
+        // than faking one, since the whole point is showing your working.
+        <p className="px-5 py-4 font-mono text-xs tracking-[0.16em] text-graphite">
+          IDENTIFIED FROM PHOTO
+        </p>
+      )}
 
       <div className="border-t border-rule px-5 py-4">
         <h2 className="font-display text-lg font-semibold uppercase tracking-tight">
           {verdict.item.name}
         </h2>
-        {verdict.item.brand && (
+        {(verdict.item.brand || hasNutrition) && (
           <p className="font-mono text-xs text-graphite">
             {verdict.item.brand}
-            {" · "}
-            100g
+            {verdict.item.brand && hasNutrition ? " · " : ""}
+            {/* Only claim a basis when there are numbers it applies to. */}
+            {hasNutrition ? "per 100g" : ""}
           </p>
         )}
       </div>
@@ -157,7 +169,8 @@ export function Receipt({
                             rel="noopener noreferrer"
                             className="underline decoration-rule underline-offset-2 hover:decoration-ink"
                           >
-                            {id} &#8599;
+                            {id}
+                            {" ↗"}
                           </a>
                         ) : (
                           <span>{id}</span>
