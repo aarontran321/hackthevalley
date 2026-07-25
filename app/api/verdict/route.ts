@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { GeminiError, generateJson, hasApiKey } from "@/lib/gemini";
+import { lookupBarcode } from "@/lib/openfoodfacts";
 import { retrieveGuidelines } from "@/lib/retrieval";
 import { runRules } from "@/lib/rules";
 import type { FoodItem, Trimester } from "@/lib/types";
@@ -24,6 +25,8 @@ import {
  */
 
 interface VerdictRequest {
+  /** Either a barcode to look up, or an already-resolved item (photo path). */
+  barcode?: string;
   item?: FoodItem;
   trimester?: number;
   week?: number;
@@ -42,9 +45,22 @@ export async function POST(request: Request) {
     return badRequest("body was not valid JSON");
   }
 
-  const item = body.item;
+  // Resolving the barcode here rather than in a fourth route: one round trip
+  // from the aisle, and the spec's route budget stays at three.
+  let item = body.item;
+  if (!item && typeof body.barcode === "string") {
+    const found = await lookupBarcode(body.barcode);
+    if (!found.ok) {
+      return NextResponse.json(
+        { error: "product-not-found", reason: found.reason, barcode: body.barcode },
+        { status: 404 },
+      );
+    }
+    item = found.item;
+  }
+
   if (!item || typeof item.name !== "string" || !Array.isArray(item.ingredients)) {
-    return badRequest("item must have a name and an ingredients array");
+    return badRequest("provide either a barcode or an item with name and ingredients");
   }
 
   const trimester = ([1, 2, 3].includes(Number(body.trimester))

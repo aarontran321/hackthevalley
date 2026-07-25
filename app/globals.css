@@ -61,4 +61,32 @@
     margin-bottom: 0.28em;
     border-bottom: 1px dotted var(--color-rule);
   }
+
+  /* The scanner's single hairline sweep. */
+  .sweep {
+    animation: sweep 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes sweep {
+  0%,
+  100% {
+    top: 12%;
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  50% {
+    top: 88%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sweep {
+    animation: none;
+    top: 50%;
+    opacity: 0.5;
+  }
 }
