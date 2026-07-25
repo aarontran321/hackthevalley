@@ -31,13 +31,38 @@ const model = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 
 const client = () => {
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_NOT_CONFIGURED");
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  // Vertex AI path (fe63c3b): an Express Mode key sets only the flag; full
+  // Vertex with Application Default Credentials also needs project/location.
+  const useVertexAI = process.env.GOOGLE_GENAI_USE_VERTEXAI === "true";
+  return new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    vertexai: useVertexAI,
+    ...(useVertexAI && process.env.GOOGLE_CLOUD_PROJECT
+      ? {
+          project: process.env.GOOGLE_CLOUD_PROJECT,
+          location: process.env.GOOGLE_CLOUD_LOCATION || "global"
+        }
+      : {})
+  });
 };
 
 /** Whole corpus, for the calls that reason over a food log rather than one item. */
 const allSourcesText = GUIDELINES.map(
   (g) => `[${g.id}] ${g.authority} — ${g.title}\n${g.summary}`,
 ).join("\n\n");
+
+/**
+ * Ordinary text searches such as "apple with peanut butter" may not trigger a
+ * high-stakes hazard keyword. They still deserve a useful report, so give the
+ * model a small cross-authority baseline covering nutrition, produce safety,
+ * allergens, and handling. This is not permission to infer beyond the corpus.
+ */
+const TEXT_SEARCH_BASELINE_IDS = [
+  "ACOG-NUTRITION-01",
+  "CDC-SAFERFOOD-2025",
+  "FDA-ALLERGIES-2025",
+  "HC-SAFEFOOD-2025",
+];
 
 const analysisResponseSchema = {
   type: Type.OBJECT,
@@ -150,7 +175,13 @@ export async function analyseItem(input: {
   // --- Layer 1: deterministic rules, before the model is consulted at all.
   const item = toFoodItem(input.item);
   const matches = runRules(item, { trimester, conditions });
-  const guidelines = retrieveGuidelines(item, matches, { conditions });
+  const retrievedGuidelines = retrieveGuidelines(item, matches, { conditions });
+  const guidelines =
+    input.mode === "text" && retrievedGuidelines.length === 0
+      ? TEXT_SEARCH_BASELINE_IDS
+          .map((id) => GUIDELINE_BY_ID.get(id))
+          .filter((guideline): guideline is NonNullable<typeof guideline> => Boolean(guideline))
+      : retrievedGuidelines;
 
   // Nothing retrieved and no rule fired: no hazard document could apply, so
   // answer deterministically rather than inviting the model to reach for one.
@@ -179,11 +210,13 @@ export async function analyseItem(input: {
           buildPrecheckText(matches),
           ``,
           `APPROVED GUIDANCE SOURCES (the only IDs you may cite):`,
-          buildSourcesText(guidelines.length > 0 ? guidelines : GUIDELINES.slice(0, 6)),
+          buildSourcesText(guidelines.length > 0 ? guidelines : GUIDELINES.slice(0, 8)),
           ``,
           input.imageDataUrl
             ? `For the image, first identify the likely item, visible ingredients and preparation, and reflect uncertainty in limitations and confidence.`
-            : `Return the requested structured analysis.`,
+            : input.mode === "text"
+              ? `Interpret the user's named food or meal literally. Give a useful item-specific report using only the supplied guidance. If preparation, pasteurization, portion, allergens, or ingredients are unknown, state that uncertainty rather than treating the item as unidentified.`
+              : `Return the requested structured analysis.`,
         ].join("\n"),
       },
     ];
@@ -310,7 +343,13 @@ export async function chatAboutAnalysis(profile: UserProfile, analysis: FoodAnal
   const response = await withRetry(() =>
     client().models.generateContent({
       model,
-      contents: `Profile: ${JSON.stringify(profile)}\nAnalysis: ${JSON.stringify(analysis)}\nApproved sources: ${allSourcesText}\nConversation: ${JSON.stringify(messages)}\nAnswer the latest question in 2-4 calm, plain-language paragraphs. Use only the supplied context and source summaries. Say when information is unknown.`,
+      // Conversational voice from fe63c3b: short and direct beats a report.
+      contents: `You are having a one-on-one conversation, not writing a report. Answer the latest question directly in a warm, natural voice. Use 2-5 short sentences and no more than 110 words. Do not repeat the user's question, recap the full analysis, list unrelated guidance, or over-explain. Cite at most two relevant supplied source IDs in one brief final parenthetical. If the user asks a broader pregnancy food, drink, or supplement question, answer it when the supplied sources support it. When they do not, say so briefly and suggest the most relevant qualified professional.
+
+Profile: ${JSON.stringify(profile)}
+Current food analysis: ${JSON.stringify(analysis)}
+Approved sources: ${allSourcesText}
+Conversation: ${JSON.stringify(messages)}`,
       config: { systemInstruction: system },
     }),
   );

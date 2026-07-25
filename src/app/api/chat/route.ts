@@ -7,7 +7,10 @@ import { foodAnalysisSchema, profileSchema } from "@/lib/schemas";
 const schema = z.object({
   profile: profileSchema,
   analysis: foodAnalysisSchema.passthrough(),
-  messages: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1).max(1000) })).min(1).max(12)
+  messages: z.array(z.discriminatedUnion("role", [
+    z.object({ role: z.literal("user"), content: z.string().trim().min(1).max(1000) }),
+    z.object({ role: z.literal("assistant"), content: z.string().min(1).max(8000) })
+  ])).min(1).max(12)
 });
 
 export async function POST(request: NextRequest) {

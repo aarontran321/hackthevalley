@@ -63,7 +63,7 @@ export function toFoodItem(input: unknown, fallbackName = "Unidentified food"): 
   const o = (typeof input === "object" && input !== null ? input : {}) as Record<string, unknown>;
 
   const name =
-    [o.name, o.itemName, o.product_name, o.title, o.query]
+    [o.name, o.itemName, o.product_name, o.title, o.query, o.searchQuery]
       .find((v): v is string => typeof v === "string" && v.trim().length > 0)
       ?.trim() ?? fallbackName;
 

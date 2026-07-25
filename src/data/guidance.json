@@ -7,7 +7,24 @@
     "topic": "Fish and mercury",
     "hazardClass": "mercury",
     "summary": "Highest-mercury species — shark, swordfish, king mackerel, tilefish, bigeye tuna, marlin, orange roughy — are in the Choices to Avoid category and should not be eaten in pregnancy. Best Choices fish remain recommended at 2–3 servings weekly, four ounces per serving.",
-    "applicableRisks": ["fish", "seafood", "tuna", "shark", "swordfish", "mackerel", "tilefish", "marlin", "roughy", "salmon", "cod", "halibut", "sushi", "mercury", "pescado", "poisson"]
+    "applicableRisks": [
+      "fish",
+      "seafood",
+      "tuna",
+      "shark",
+      "swordfish",
+      "mackerel",
+      "tilefish",
+      "marlin",
+      "roughy",
+      "salmon",
+      "cod",
+      "halibut",
+      "sushi",
+      "mercury",
+      "pescado",
+      "poisson"
+    ]
   },
   {
     "id": "FDA-LISTERIA-2022",
@@ -17,7 +34,18 @@
     "topic": "Listeria",
     "hazardClass": "listeria",
     "summary": "Pregnant people are about ten times more likely to get listeriosis. Listeria monocytogenes grows at refrigerator temperatures in ready-to-eat foods. Infection can cause miscarriage, stillbirth, premature delivery, or death of the newborn, even when the pregnant person feels only mildly ill.",
-    "applicableRisks": ["listeria", "ready to eat", "ready-to-eat", "refrigerated", "chilled", "smoked salmon", "smoked fish", "deli", "cold cut", "leftovers"]
+    "applicableRisks": [
+      "listeria",
+      "ready to eat",
+      "ready-to-eat",
+      "refrigerated",
+      "chilled",
+      "smoked salmon",
+      "smoked fish",
+      "deli",
+      "cold cut",
+      "leftovers"
+    ]
   },
   {
     "id": "FDA-DELI-RTE-2022",
@@ -27,7 +55,27 @@
     "topic": "Deli meat",
     "hazardClass": "listeria",
     "summary": "Hot dogs, deli meats, and luncheon meats should not be eaten unless reheated until steaming hot. Contamination can occur after the food is cooked at the factory but before it is packaged. Refrigerated smoked seafood is also unsafe unless cooked into a dish such as a casserole.",
-    "applicableRisks": ["deli", "ham", "turkey", "chicken breast", "salami", "bologna", "hot dog", "frankfurter", "sausage", "pastrami", "prosciutto", "luncheon", "charcuterie", "pechuga", "pavo", "jamon", "jambon", "fiambre", "mortadela"]
+    "applicableRisks": [
+      "deli",
+      "ham",
+      "turkey",
+      "chicken breast",
+      "salami",
+      "bologna",
+      "hot dog",
+      "frankfurter",
+      "sausage",
+      "pastrami",
+      "prosciutto",
+      "luncheon",
+      "charcuterie",
+      "pechuga",
+      "pavo",
+      "jamon",
+      "jambon",
+      "fiambre",
+      "mortadela"
+    ]
   },
   {
     "id": "FDA-RAWMILK-2024",
@@ -37,7 +85,18 @@
     "topic": "Unpasteurized dairy",
     "hazardClass": "unpasteurized",
     "summary": "FDA advises pregnant people not to drink raw (unpasteurized) milk or eat foods made from it. Raw milk can carry Listeria, Salmonella, E. coli, and Campylobacter. Drinking it can harm the baby even if the pregnant person does not feel sick.",
-    "applicableRisks": ["milk", "raw milk", "unpasteurized", "unpasteurised", "dairy", "cream", "leche", "lait", "kefir", "buttermilk"]
+    "applicableRisks": [
+      "milk",
+      "raw milk",
+      "unpasteurized",
+      "unpasteurised",
+      "dairy",
+      "cream",
+      "leche",
+      "lait",
+      "kefir",
+      "buttermilk"
+    ]
   },
   {
     "id": "NHS-SOFTCHEESE-2023",
@@ -47,7 +106,20 @@
     "topic": "Soft cheese",
     "hazardClass": "unpasteurized",
     "summary": "Mould-ripened soft cheeses with a white coating — brie, camembert, chèvre — and soft blue cheeses must be thoroughly cooked before eating, whether pasteurised or not, because they may contain listeria. Hard cheeses and pasteurised cottage cheese, cream cheese and mozzarella are fine.",
-    "applicableRisks": ["cheese", "brie", "camembert", "chevre", "blue cheese", "roquefort", "gorgonzola", "feta", "queso", "mozzarella", "ricotta", "fromage"]
+    "applicableRisks": [
+      "cheese",
+      "brie",
+      "camembert",
+      "chevre",
+      "blue cheese",
+      "roquefort",
+      "gorgonzola",
+      "feta",
+      "queso",
+      "mozzarella",
+      "ricotta",
+      "fromage"
+    ]
   },
   {
     "id": "NHS-VITAMINA-2023",
@@ -57,7 +129,17 @@
     "topic": "Vitamin A",
     "hazardClass": "retinol",
     "summary": "Liver and foods containing liver, such as pâté and liver sausage, have high levels of vitamin A (retinol), which can be harmful to the baby. Avoid them, along with high-dose vitamin A supplements. All types of pâté, including vegetable pâté, can also contain listeria.",
-    "applicableRisks": ["liver", "pate", "pâté", "foie", "vitamin a", "retinol", "liverwurst", "braunschweiger", "higado"]
+    "applicableRisks": [
+      "liver",
+      "pate",
+      "pâté",
+      "foie",
+      "vitamin a",
+      "retinol",
+      "liverwurst",
+      "braunschweiger",
+      "higado"
+    ]
   },
   {
     "id": "NHS-RAWANIMAL-2023",
@@ -67,7 +149,23 @@
     "topic": "Raw animal products",
     "hazardClass": "raw-animal-product",
     "summary": "Raw or undercooked meat carries a toxoplasmosis risk and should be avoided; cook meat thoroughly. Hen eggs without a British Lion stamp, and eggs from other birds, should not be eaten raw or partially cooked — cook until the white and yolk are solid.",
-    "applicableRisks": ["egg", "raw", "undercooked", "rare", "tartare", "carpaccio", "ceviche", "sashimi", "runny", "mayonnaise", "mousse", "tiramisu", "meat", "beef", "pork"]
+    "applicableRisks": [
+      "egg",
+      "raw",
+      "undercooked",
+      "rare",
+      "tartare",
+      "carpaccio",
+      "ceviche",
+      "sashimi",
+      "runny",
+      "mayonnaise",
+      "mousse",
+      "tiramisu",
+      "meat",
+      "beef",
+      "pork"
+    ]
   },
   {
     "id": "FDA-SPROUTS-2023",
@@ -77,7 +175,16 @@
     "topic": "Raw sprouts",
     "hazardClass": "listeria",
     "summary": "People more vulnerable to foodborne illness should avoid raw or lightly cooked sprouts of any kind, including alfalfa, clover, radish, onion and mung bean. Bacteria can enter the seed through cracks in the shell and are nearly impossible to wash out. Cook sprouts thoroughly.",
-    "applicableRisks": ["sprout", "alfalfa", "mung", "clover", "radish", "bean sprout", "salad", "produce"]
+    "applicableRisks": [
+      "sprout",
+      "alfalfa",
+      "mung",
+      "clover",
+      "radish",
+      "bean sprout",
+      "salad",
+      "produce"
+    ]
   },
   {
     "id": "CDC-ALCOHOL-2026",
@@ -87,7 +194,22 @@
     "topic": "Alcohol",
     "hazardClass": "alcohol",
     "summary": "There is no known safe amount of alcohol use during pregnancy, and no safe time during pregnancy to drink. All types of alcohol can be harmful, including red or white wine, beer, and liquor. Use is associated with miscarriage, preterm birth, stillbirth, and fetal alcohol spectrum disorders.",
-    "applicableRisks": ["alcohol", "wine", "beer", "vodka", "rum", "whisky", "whiskey", "liqueur", "cider", "spirit", "ethanol", "vino", "cerveza", "biere"]
+    "applicableRisks": [
+      "alcohol",
+      "wine",
+      "beer",
+      "vodka",
+      "rum",
+      "whisky",
+      "whiskey",
+      "liqueur",
+      "cider",
+      "spirit",
+      "ethanol",
+      "vino",
+      "cerveza",
+      "biere"
+    ]
   },
   {
     "id": "ACOG-CAFFEINE-2010",
@@ -97,7 +219,19 @@
     "topic": "Caffeine",
     "hazardClass": "caffeine",
     "summary": "Experts recommend no more than 200 mg of caffeine a day during pregnancy, about one 12-ounce cup of coffee. Moderate consumption below that level does not appear to be a major contributing factor in miscarriage or preterm birth. Caffeine from all sources counts, including tea, cola and chocolate.",
-    "applicableRisks": ["caffeine", "coffee", "espresso", "tea", "cola", "energy drink", "matcha", "guarana", "chocolate", "cocoa", "yerba"]
+    "applicableRisks": [
+      "caffeine",
+      "coffee",
+      "espresso",
+      "tea",
+      "cola",
+      "energy drink",
+      "matcha",
+      "guarana",
+      "chocolate",
+      "cocoa",
+      "yerba"
+    ]
   },
   {
     "id": "NHS-GDM-2023",
@@ -107,7 +241,18 @@
     "topic": "Gestational diabetes",
     "hazardClass": "added-sugar-gdm",
     "summary": "Gestational diabetes causes high blood sugar during pregnancy. NHS guidance is that blood sugar levels may be reduced by changing your diet and being more active. People diagnosed with it are referred for dietary advice and given blood-sugar targets to monitor against.",
-    "applicableRisks": ["sugar", "syrup", "glucose", "fructose", "carbohydrate", "dextrose", "maltodextrin", "sweetener", "honey", "diabetes"]
+    "applicableRisks": [
+      "sugar",
+      "syrup",
+      "glucose",
+      "fructose",
+      "carbohydrate",
+      "dextrose",
+      "maltodextrin",
+      "sweetener",
+      "honey",
+      "diabetes"
+    ]
   },
   {
     "id": "CDC-FOLATE-2026",
@@ -117,7 +262,17 @@
     "topic": "Folic acid",
     "hazardClass": "none",
     "summary": "All people capable of becoming pregnant should get 400 micrograms of folic acid daily to help prevent neural tube defects — severe birth defects of the brain and spine. These defects form in the first few weeks of pregnancy, often before pregnancy is known.",
-    "applicableRisks": ["folate", "folic acid", "spinach", "leafy greens", "lentils", "fortified", "cereal", "beans", "prenatal vitamin"]
+    "applicableRisks": [
+      "folate",
+      "folic acid",
+      "spinach",
+      "leafy greens",
+      "lentils",
+      "fortified",
+      "cereal",
+      "beans",
+      "prenatal vitamin"
+    ]
   },
   {
     "id": "CDC-SAFERFOOD-2025",
@@ -127,7 +282,25 @@
     "topic": "Foodborne illness",
     "hazardClass": "listeria",
     "summary": "A riskier-versus-safer table covering meat, deli salads, produce, juice, milk, cheese, eggs, seafood and flour. Deli meat and deli-sliced cheese should be heated to 165°F or until steaming. Premade deli salads, unpasteurized juice, and raw flour dough are listed as riskier choices.",
-    "applicableRisks": ["deli salad", "coleslaw", "potato salad", "tuna salad", "juice", "cider", "melon", "flour", "cookie dough", "batter", "sprouts", "queso fresco"]
+    "applicableRisks": [
+      "deli salad",
+      "fruit",
+      "vegetable",
+      "produce",
+      "apple",
+      "berries",
+      "coleslaw",
+      "potato salad",
+      "tuna salad",
+      "juice",
+      "cider",
+      "melon",
+      "flour",
+      "cookie dough",
+      "batter",
+      "sprouts",
+      "queso fresco"
+    ]
   },
   {
     "id": "ACOG-NUTRITION-01",
@@ -137,6 +310,204 @@
     "topic": "Pregnancy nutrition",
     "hazardClass": "none",
     "summary": "A varied diet during pregnancy should include protein, iron, folic acid, calcium, vitamin D, choline, and omega-3 fatty acids; individual needs should be discussed with a clinician.",
-    "applicableRisks": ["iron", "folate", "calcium", "protein", "nutrition", "vitamin d", "choline", "omega-3"]
+    "applicableRisks": [
+      "iron",
+      "folate",
+      "calcium",
+      "protein",
+      "nutrition",
+      "fruit",
+      "vegetable",
+      "nuts",
+      "seeds",
+      "whole grain",
+      "yogurt",
+      "snack",
+      "vitamin d",
+      "choline",
+      "omega-3"
+    ]
+  },
+  {
+    "id": "NHS-SUPPLEMENTS-01",
+    "title": "Pregnancy vitamins and supplements",
+    "organization": "NHS",
+    "url": "https://www.nhs.uk/pregnancy/keeping-well/pregnancy-vitamins-and-supplements/",
+    "topic": "Vitamins and supplements",
+    "hazardClass": "retinol",
+    "summary": "A varied diet supports pregnancy nutrition. Supplements containing vitamin A or retinol and cod liver oil should be avoided during pregnancy; questions about individual supplements or higher doses should go to a GP, midwife, or pharmacist.",
+    "applicableRisks": [
+      "supplement",
+      "vitamin",
+      "vitamin a",
+      "retinol",
+      "cod liver oil",
+      "folic acid",
+      "multivitamin"
+    ]
+  },
+  {
+    "id": "FDA-SUPPLEMENTS-01",
+    "title": "FDA 101: Dietary Supplements",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/consumers/consumer-updates/fda-101-dietary-supplements",
+    "topic": "Dietary and herbal supplements",
+    "hazardClass": "none",
+    "summary": "Dietary supplements, including vitamins, minerals, herbs, probiotics, and botanical products, are not approved by FDA for safety and effectiveness before sale and can involve risks. A healthcare professional can help assess a specific supplement, especially alongside medications.",
+    "applicableRisks": [
+      "supplement",
+      "herbal",
+      "botanical",
+      "probiotic",
+      "medication interaction",
+      "tea",
+      "tincture"
+    ]
+  },
+  {
+    "id": "HC-SAFEFOOD-2025",
+    "title": "Safe food handling for pregnant people",
+    "organization": "Health Canada",
+    "url": "https://www.canada.ca/en/health-canada/services/publications/food-nutrition/safe-food-handling-pregnant-people.html",
+    "topic": "Food handling and storage",
+    "hazardClass": "listeria",
+    "summary": "Food poisoning can be more serious during pregnancy. Health Canada recommends careful shopping, cleaning, separating, cooking, chilling, thawing, and storage practices, with extra care for higher-risk refrigerated and ready-to-eat foods.",
+    "applicableRisks": [
+      "leftover",
+      "storage",
+      "refrigerated",
+      "frozen",
+      "meal prep",
+      "takeout",
+      "buffet",
+      "ready to eat",
+      "food handling"
+    ]
+  },
+  {
+    "id": "CDC-TOXO-2024",
+    "title": "Preventing toxoplasmosis",
+    "organization": "Centers for Disease Control and Prevention",
+    "url": "https://www.cdc.gov/toxoplasmosis/prevention/index.html",
+    "topic": "Toxoplasmosis",
+    "hazardClass": "raw-animal-product",
+    "summary": "Use a food thermometer to cook meat to a safe internal temperature, rinse produce under running water, avoid unpasteurized goat milk and raw or undercooked shellfish, and clean utensils and surfaces after contact with raw foods.",
+    "applicableRisks": [
+      "raw meat",
+      "rare meat",
+      "undercooked",
+      "oyster",
+      "mussel",
+      "clam",
+      "goat milk",
+      "unwashed produce",
+      "toxoplasmosis"
+    ]
+  },
+  {
+    "id": "FDA-EATINGOUT-2025",
+    "title": "Eating out and bringing food home during pregnancy",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/people-risk-foodborne-illness/eating-out-bringing-food-safety-moms-be",
+    "topic": "Restaurant and takeout food",
+    "hazardClass": "listeria",
+    "summary": "When eating out during pregnancy, choose clean establishments, avoid raw or undercooked animal foods, refrigerate takeout and leftovers promptly, and reheat leftovers thoroughly before eating.",
+    "applicableRisks": [
+      "restaurant",
+      "takeout",
+      "delivery",
+      "leftover",
+      "doggie bag",
+      "buffet",
+      "catering",
+      "meal",
+      "dining"
+    ]
+  },
+  {
+    "id": "FDA-SEAFOOD-2025",
+    "title": "Meat, poultry and seafood safety for pregnancy",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/people-risk-foodborne-illness/meat-poultry-seafood-food-safety-moms-be",
+    "topic": "Cooking meat and seafood",
+    "hazardClass": "raw-animal-product",
+    "summary": "Avoid raw or undercooked finfish and shellfish during pregnancy. Cook seafood, meat, and poultry thoroughly, prevent raw juices from contaminating other food, and keep foods refrigerated while marinating.",
+    "applicableRisks": [
+      "seafood",
+      "shellfish",
+      "oyster",
+      "scallop",
+      "shrimp",
+      "lobster",
+      "fish",
+      "chicken",
+      "poultry",
+      "steak",
+      "marinade"
+    ]
+  },
+  {
+    "id": "NHS-IRON-2024",
+    "title": "Iron deficiency anaemia",
+    "organization": "NHS",
+    "url": "https://www.nhs.uk/conditions/iron-deficiency-anaemia/",
+    "topic": "Iron-rich foods",
+    "hazardClass": "none",
+    "summary": "Pregnancy is a common cause of iron deficiency anaemia. Iron-containing foods include dark-green leafy vegetables, fortified cereals and bread, meat, dried fruit, beans, peas, and lentils. A clinician should assess symptoms and recommend treatment.",
+    "applicableRisks": [
+      "iron",
+      "anaemia",
+      "anemia",
+      "lentil",
+      "bean",
+      "peas",
+      "leafy greens",
+      "fortified cereal",
+      "dried fruit",
+      "meat"
+    ]
+  },
+  {
+    "id": "HC-PRENATAL-NUTRITION-2023",
+    "title": "Prenatal nutrition and food safety",
+    "organization": "Public Health Agency of Canada",
+    "url": "https://www.canada.ca/en/public-health/services/publications/healthy-living/maternity-newborn-care-guidelines-chapter-3.html",
+    "topic": "Prenatal nutrition and herbal tea",
+    "hazardClass": "none",
+    "summary": "Canadian prenatal guidance covers a varied diet, folate-rich foods, food safety, fish and mercury, caffeine, and herbal teas. Not every herbal tea is appropriate during pregnancy, so ingredients should be checked rather than assuming caffeine-free means pregnancy-suitable.",
+    "applicableRisks": [
+      "herbal tea",
+      "chamomile",
+      "aloe",
+      "comfrey",
+      "senna",
+      "ginger tea",
+      "rosehip",
+      "nutrition",
+      "folate"
+    ]
+  },
+  {
+    "id": "FDA-ALLERGIES-2025",
+    "title": "Food allergies and allergen labeling",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/food-labeling-nutrition/food-allergies",
+    "topic": "Food allergies",
+    "hazardClass": "none",
+    "summary": "Food labels must identify major allergens. People with food allergies should read ingredient and contains statements carefully and consider cross-contact warnings; an uncertain or incomplete label cannot confirm that a product fits an individual allergy.",
+    "applicableRisks": [
+      "allergy",
+      "allergen",
+      "peanut",
+      "tree nut",
+      "milk",
+      "egg",
+      "wheat",
+      "soy",
+      "sesame",
+      "fish",
+      "shellfish",
+      "contains"
+    ]
   }
 ]
