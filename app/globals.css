@@ -68,6 +68,81 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   The receipt. Torn top and bottom edge, unrolling downward on load.
+   --------------------------------------------------------------------------- */
+
+.receipt {
+  --tear-h: 9px;
+  --tear-w: 18px;
+  --tear-top: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='9'><path d='M0 9 L9 0 L18 9 Z' fill='%23000'/></svg>");
+  --tear-bottom: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='9'><path d='M0 0 L9 9 L18 0 Z' fill='%23000'/></svg>");
+
+  /* Three mask layers: zigzag, solid body, zigzag. The body inset by the tear
+     height on both ends so the teeth read as torn paper rather than a border. */
+  -webkit-mask-image: var(--tear-top), linear-gradient(#000, #000), var(--tear-bottom);
+  -webkit-mask-size:
+    var(--tear-w) var(--tear-h),
+    100% calc(100% - var(--tear-h) * 2),
+    var(--tear-w) var(--tear-h);
+  -webkit-mask-position: left top, left var(--tear-h), left bottom;
+  -webkit-mask-repeat: repeat-x, no-repeat, repeat-x;
+  mask-image: var(--tear-top), linear-gradient(#000, #000), var(--tear-bottom);
+  mask-size:
+    var(--tear-w) var(--tear-h),
+    100% calc(100% - var(--tear-h) * 2),
+    var(--tear-w) var(--tear-h);
+  mask-position: left top, left var(--tear-h), left bottom;
+  mask-repeat: repeat-x, no-repeat, repeat-x;
+
+  padding-block: var(--tear-h);
+
+  /* White strip on #FAF9F5 canvas is about 2% contrast, so without this the
+     torn silhouette is invisible at real size. drop-shadow traces the mask's
+     alpha channel — box-shadow would follow the rectangular border box and
+     miss the teeth entirely, which is the whole point of the effect. */
+  filter: drop-shadow(0 1px 1px rgb(22 24 28 / 0.05))
+    drop-shadow(0 4px 10px rgb(22 24 28 / 0.05));
+}
+
+/* The one showpiece: the strip unrolls downward. */
+@keyframes unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Each line item arrives just behind the unrolling edge. */
+@keyframes line-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.receipt-unroll {
+  animation: unroll 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.receipt-line {
+  animation: line-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .receipt-unroll,
+  .receipt-line {
+    animation: none;
+  }
+}
+
 @keyframes sweep {
   0%,
   100% {
