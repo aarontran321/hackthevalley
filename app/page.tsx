@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 
 import { Chat } from "@/components/Chat";
 import { ConfirmFood, needsConfirmation } from "@/components/ConfirmFood";
@@ -33,7 +33,7 @@ type Screen =
   | { kind: "scanning" }
   | { kind: "confirm"; food: IdentifiedFood; previewUrl?: string }
   | { kind: "working"; label: string }
-  | { kind: "verdict"; barcode?: string; verdict: Verdict; degraded?: string }
+  | { kind: "verdict"; barcode?: string; verdict: Verdict; degraded?: string; saved?: boolean }
   | { kind: "error"; message: string };
 
 export default function Home() {
@@ -43,6 +43,11 @@ export default function Home() {
   const [demo, setDemo] = useState(false);
 
   useEffect(() => {
+    // Hydrating from browser-only sources. localStorage and location.search do
+    // not exist during SSR, so this genuinely cannot happen before mount and
+    // cannot be a lazy initializer without a hydration mismatch. React batches
+    // these into a single render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDemo(new URLSearchParams(window.location.search).get("demo") === "1");
     const existing = loadProfile();
     setProfile(existing);
@@ -185,15 +190,7 @@ export default function Home() {
         />
       )}
 
-      {screen.kind === "working" && (
-        <div className="mx-auto w-full max-w-[420px] space-y-3" aria-busy="true">
-          <p className="font-mono text-xs tracking-[0.16em] text-graphite">{screen.label}</p>
-          <p className="font-display text-lg font-semibold">Reading the label…</p>
-          <p className="text-sm text-graphite">
-            Checking the ingredients against published guidance.
-          </p>
-        </div>
-      )}
+      {screen.kind === "working" && <Working label={screen.label} />}
 
       {screen.kind === "error" && (
         <div className="mx-auto w-full max-w-[420px] space-y-4">
@@ -222,18 +219,21 @@ export default function Home() {
             </p>
           )}
           <div className="mx-auto flex w-full max-w-[420px] gap-2">
+            {/* Stay on the receipt and confirm. Bouncing straight back to the
+                scanner made saving look like it had done nothing. */}
             <button
+              disabled={screen.saved}
               onClick={() => {
                 saveScan({
                   barcode: screen.barcode,
                   verdict: screen.verdict,
                   at: new Date().toISOString(),
                 });
-                reset();
+                setScreen({ ...screen, saved: true });
               }}
-              className="flex-1 rounded-xs border border-ink px-4 py-3 font-mono text-xs tracking-[0.14em]"
+              className="flex-1 rounded-xs border border-ink px-4 py-3 font-mono text-xs tracking-[0.14em] disabled:border-rule disabled:text-graphite"
             >
-              SAVE
+              {screen.saved ? "SAVED ✓" : "SAVE"}
             </button>
             <button
               onClick={reset}
@@ -244,6 +244,55 @@ export default function Home() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * The verdict round trip runs about nine seconds, which makes this the
+ * second-longest-lived screen in the app. It borrows the receipt's shape and
+ * names the three stages of the spine — the same "show your working" the
+ * verdict itself is built on, rather than a spinner.
+ *
+ * The stages are labelled, not tracked: it is one request, so claiming live
+ * per-stage progress would be a lie.
+ */
+function Working({ label }: { label: string }) {
+  const stages = [
+    "reading the ingredients",
+    "matching published guidelines",
+    "writing it in plain language",
+  ];
+
+  return (
+    <div
+      className="receipt mx-auto w-full max-w-[420px] border-x border-rule bg-white"
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <div className="px-5 py-4">
+        <p className="font-mono text-xs tracking-[0.16em] text-graphite">{label}</p>
+      </div>
+      <div className="space-y-3 border-t border-rule px-5 py-4">
+        {stages.map((s, i) => (
+          <div
+            key={s}
+            className="receipt-line flex items-baseline gap-2"
+            style={{ "--i": i * 3 } as CSSProperties}
+          >
+            <span className="font-mono text-sm">{s}</span>
+            <span aria-hidden className="leader" />
+            <span aria-hidden className="sweep-dot font-mono text-xs text-graphite">
+              ···
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-rule px-5 py-4">
+        <p className="font-mono text-xs text-graphite">
+          nothing is saved unless you tap save
+        </p>
+      </div>
     </div>
   );
 }
