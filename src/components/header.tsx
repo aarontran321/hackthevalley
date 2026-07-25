@@ -15,15 +15,15 @@ export function Header() {
   const pathname = usePathname();
   return (
     <>
-      <header style={{ height: 72, borderBottom: "1px solid var(--line)", background: "rgba(251,248,242,.88)", backdropFilter: "blur(16px)", position: "sticky", top: 0, zIndex: 40 }}>
-        <div className="container" style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 700 }}>
-            <span style={{ width: 36, height: 36, display: "grid", placeItems: "center", background: "var(--sage)", borderRadius: 12 }}><HeartPulse size={20} /></span>
-            BumpSafe
+      <header className="site-header">
+        <div className="container header-inner">
+          <Link href="/" className="brand">
+            <span className="brand-mark"><HeartPulse size={20} /></span>
+            <span>nutri.ai<small>food guidance</small></span>
           </Link>
-          <nav style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <nav className="site-nav" aria-label="Primary navigation">
             {nav.map(({ href, label, icon: Icon }) => (
-              <Link key={href} href={href} title={label} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 12px", borderRadius: 999, fontSize: 14, fontWeight: 700, background: pathname.startsWith(href) ? "var(--sage)" : "transparent" }}>
+              <Link key={href} href={href} title={label} className={pathname.startsWith(href) ? "is-active" : ""}>
                 <Icon size={17} /><span className="nav-label">{label}</span>
               </Link>
             ))}

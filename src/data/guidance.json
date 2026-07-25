@@ -509,5 +509,82 @@
       "shellfish",
       "contains"
     ]
+  },
+  {
+    "id": "FDA-SWEETENERS-2025",
+    "title": "Aspartame and other sweeteners in food",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/food-additives-petitions/aspartame-and-other-sweeteners-food",
+    "topic": "Sweeteners and sugar alcohols",
+    "hazardClass": "none",
+    "summary": "FDA describes permitted high-intensity sweeteners and sugar alcohols used in foods. Sugar alcohols such as sorbitol, xylitol, erythritol and maltitol are common in sugar-free gum, cause a smaller blood-glucose change than sugar, and may cause gastrointestinal effects in some people.",
+    "applicableRisks": [
+      "gum",
+      "chewing gum",
+      "spearmint",
+      "peppermint",
+      "mint",
+      "sugar free",
+      "sugar-free",
+      "aspartame",
+      "acesulfame",
+      "sucralose",
+      "saccharin",
+      "stevia",
+      "sorbitol",
+      "xylitol",
+      "erythritol",
+      "maltitol",
+      "mannitol",
+      "sweetener",
+      "sugar alcohol"
+    ]
+  },
+  {
+    "id": "FDA-ADDEDSUGAR-2025",
+    "title": "Added sugars on the Nutrition Facts label",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/nutrition-facts-label/added-sugars-nutrition-facts-label",
+    "topic": "Added sugars and label reading",
+    "hazardClass": "none",
+    "summary": "FDA explains that added sugars are shown in grams and percent Daily Value on packaged-food labels. The label can be used to compare products; a food may contain some added sugar within an overall healthy eating pattern, while high intake can make nutrient needs harder to meet.",
+    "applicableRisks": [
+      "added sugar",
+      "sugar",
+      "sucrose",
+      "glucose",
+      "dextrose",
+      "fructose",
+      "corn syrup",
+      "candy",
+      "gum",
+      "sweet",
+      "nutrition facts"
+    ]
+  },
+  {
+    "id": "NHS-SWEETENERS-2023",
+    "title": "The truth about sweeteners",
+    "organization": "NHS",
+    "url": "https://www.nhs.uk/live-well/eat-well/food-types/are-sweeteners-safe/",
+    "topic": "Approved sweeteners",
+    "hazardClass": "none",
+    "summary": "NHS guidance lists approved lower- and no-calorie sweeteners commonly found in chewing gum and other foods. It notes that approved sweeteners undergo safety assessment, while products containing them are not automatically nutritionally beneficial and labels still matter.",
+    "applicableRisks": [
+      "gum",
+      "chewing gum",
+      "spearmint",
+      "peppermint",
+      "mint",
+      "sweetener",
+      "aspartame",
+      "acesulfame k",
+      "erythritol",
+      "saccharin",
+      "sorbitol",
+      "sucralose",
+      "xylitol",
+      "steviol"
+    ]
   }
 ]
