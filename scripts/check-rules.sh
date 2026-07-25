@@ -5,10 +5,10 @@
 # safety failure, and a hard-flagged Brussels sprout trains the user to ignore
 # hard flags. Run this after touching lib/rules.ts.
 #
-#   ./scripts/check-rules.sh [base-url]     (default http://localhost:3001)
+#   ./scripts/check-rules.sh [base-url]     (default http://localhost:3000)
 
 set -uo pipefail
-BASE="${1:-http://localhost:3001}"
+BASE="${1:-http://localhost:3000}"
 FAILED=0
 
 check () { # name | ingredients | expected floor | [conditions]

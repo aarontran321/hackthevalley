@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 import { GUIDELINES, isRealGuidelineId } from "@/lib/guidelines";
 import { lookupBarcode } from "@/lib/openfoodfacts";
 import { runRules, ruleSeverityFloor } from "@/lib/rules";
-import type { Trimester } from "@/lib/types";
+import type { FoodItem, Trimester } from "@/lib/types";
+import { validateVerdict } from "@/lib/validate";
 
 /**
  * Development-only scratch endpoint for M2's stop condition: prove that a real
@@ -69,5 +70,44 @@ export async function GET(request: Request) {
     ruleFloor: ruleSeverityFloor(matches),
     ruleTriggered: matches.length > 0,
     matches,
+  });
+}
+
+/**
+ * Validator harness for M3's stop condition. Feed it a hand-written model
+ * response and see whether layer 3 catches it — especially a response citing a
+ * guideline ID that does not exist.
+ *
+ *   POST /api/scratch  { raw: <model response>, item: {...}, conditions: [] }
+ */
+export async function POST(request: Request) {
+  if (process.env.NODE_ENV === "production") {
+    return new NextResponse("Not found", { status: 404 });
+  }
+
+  const body = (await request.json()) as {
+    raw?: unknown;
+    item?: FoodItem;
+    conditions?: string[];
+  };
+
+  const item: FoodItem = body.item ?? {
+    name: "Deli Turkey Breast",
+    ingredients: ["turkey breast", "water", "salt"],
+    nutrition: {},
+  };
+
+  const matches = runRules(item, {
+    trimester: 2,
+    conditions: body.conditions ?? [],
+  });
+
+  const result = validateVerdict(body.raw, { item, ruleMatches: matches });
+
+  return NextResponse.json({
+    ruleFloor: ruleSeverityFloor(matches),
+    accepted: result.ok,
+    reason: result.ok ? null : result.reason,
+    detail: result.ok ? null : result.detail,
   });
 }
