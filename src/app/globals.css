@@ -385,3 +385,61 @@ a { color: inherit; text-decoration: none; }
 
 @media (prefers-reduced-motion: reduce) { .receipt-unroll { animation: none; } }
 @media print { .receipt { filter: none; } }
+
+/* ---------------------------------------------------------------------------
+   Live scanner feedback.
+   A barcode read can take several seconds of the camera quietly failing to
+   decode, which reads as a frozen video feed. The sweep says "still looking"
+   without implying progress towards a known end.
+   --------------------------------------------------------------------------- */
+
+.scan-stage { position: relative; overflow: hidden; border-radius: 12px; }
+
+/* Reticle: corner brackets only, so the barcode itself is never obscured. */
+.scan-reticle {
+  position: absolute;
+  inset: 18% 8%;
+  pointer-events: none;
+  border-radius: 14px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .5) inset;
+  animation: scanBreathe 1.9s ease-in-out infinite;
+}
+
+.scan-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 32%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(120, 214, 164, 0) 0%,
+    rgba(120, 214, 164, .42) 50%,
+    rgba(120, 214, 164, 0) 100%
+  );
+  /* translateY rather than `top` so the sweep stays on the compositor. */
+  animation: scanSweep 1.9s ease-in-out infinite;
+}
+
+@keyframes scanSweep {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(313%); }
+}
+
+@keyframes scanBreathe {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255, 255, 255, .5) inset, 0 0 0 0 rgba(120, 214, 164, .30); }
+  50% { box-shadow: 0 0 0 2px rgba(255, 255, 255, .5) inset, 0 0 0 5px rgba(120, 214, 164, .12); }
+}
+
+/* Motion is the signal, so it needs a non-motion equivalent: hold the sweep
+   still at mid-frame and keep the reticle lit rather than removing both. */
+@media (prefers-reduced-motion: reduce) {
+  .scan-sweep { animation: none; transform: translateY(106%); }
+  .scan-reticle { animation: none; box-shadow: 0 0 0 2px rgba(255, 255, 255, .5) inset, 0 0 0 4px rgba(120, 214, 164, .18); }
+}
+
+/* Status dot beside the "Scanning…" line. */
+.spin-pulse { animation: scanDot 1.9s ease-in-out infinite; }
+@keyframes scanDot { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .spin-pulse { animation: none; opacity: 1; } }
