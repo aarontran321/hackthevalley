@@ -72,6 +72,13 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000).
 
+## Chrome extension
+
+`extension/` contains a companion "BumpSafe Scanner" browser extension that
+screenshots the current tab, scans it for products via the same Gemini
+screenshot-analysis endpoint, and lets you click a detected product to send it
+into the running BumpSafe app. See `extension/README.md` for setup.
+
 Quality checks:
 
 ```bash

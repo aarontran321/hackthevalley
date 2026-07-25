@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>BumpSafe Scanner</title>
+<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="header">
+    <img src="icons/icon48.png" alt="" class="logo" />
+    <div>
+      <h1>BumpSafe Scanner</h1>
+      <p class="muted">Capture this page, then scan for products</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="preview-frame" id="previewFrame">
+      <img id="preview" alt="Screenshot preview" hidden />
+      <div id="placeholder" class="placeholder">Capturing this tab&hellip;</div>
+    </div>
+
+    <div class="actions">
+      <button id="recaptureBtn" class="btn btn-outline" type="button">Retake</button>
+      <button id="scanBtn" class="btn btn-primary" type="button" disabled>Scan with AI</button>
+    </div>
+
+    <div class="actions actions-secondary">
+      <button id="offlineScanBtn" class="btn btn-soft" type="button" disabled>Quick scan (no AI, on-device)</button>
+    </div>
+
+    <div id="status" class="status-line" hidden></div>
+
+    <button id="demoBtn" class="btn-link" type="button">Try a demo scan instead</button>
+
+    <section id="results" class="results" hidden>
+      <h2>Products found</h2>
+      <p class="muted small">Tap one to send it into BumpSafe.</p>
+      <div id="productList" class="product-list"></div>
+    </section>
+  </main>
+
+  <script src="vendor/tesseract/tesseract.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

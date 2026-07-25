@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "BumpSafe Scanner",
+  "version": "1.0.0",
+  "description": "Capture the current tab, scan it for products, and send the one you pick straight into BumpSafe for a pregnancy-safe check.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Scan this page for BumpSafe",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["activeTab", "scripting", "tabs"],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*",
+    "http://localhost:3001/*",
+    "http://127.0.0.1:3001/*",
+    "http://localhost:3100/*",
+    "http://127.0.0.1:3100/*",
+    "http://localhost:3200/*",
+    "http://127.0.0.1:3200/*",
+    "https://tessdata.projectnaptha.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
