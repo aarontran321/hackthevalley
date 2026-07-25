@@ -89,6 +89,7 @@ export async function generateJson({
   systemInstruction,
   prompt,
   schema,
+  image,
   temperature = 0.2,
   model = GEMINI_MODEL,
   thinkingBudget = -1,
@@ -96,6 +97,8 @@ export async function generateJson({
   systemInstruction: string;
   prompt: string;
   schema: Schema;
+  /** Base64 payload for the photo path. Sent inline; never stored. */
+  image?: { data: string; mimeType: string };
   temperature?: number;
   model?: string;
   /**
@@ -120,7 +123,17 @@ export async function generateJson({
     try {
       const res = await ai.models.generateContent({
         model,
-        contents: prompt,
+        contents: image
+          ? [
+              {
+                role: "user",
+                parts: [
+                  { inlineData: { data: image.data, mimeType: image.mimeType } },
+                  { text: prompt },
+                ],
+              },
+            ]
+          : prompt,
         config: {
           systemInstruction,
           responseMimeType: "application/json",

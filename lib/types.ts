@@ -41,6 +41,16 @@ export interface Alternative {
   why: string;
 }
 
+export interface IdentifiedFood {
+  name: string;
+  likelyIngredients: string[];
+  preparationMethod: string;
+  /** Below IDENTIFY_CONFIDENCE_FLOOR the UI asks the user to confirm. */
+  confidence: number;
+  /** What the model could not tell from the image. Empty means it was sure. */
+  ambiguities: string[];
+}
+
 export interface Verdict {
   item: FoodItem;
   severity: Severity;
