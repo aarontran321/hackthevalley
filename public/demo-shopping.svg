@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620">
+  <rect width="1000" height="620" fill="#f7f3ed"/>
+  <rect width="1000" height="78" fill="#31483d"/>
+  <text x="44" y="50" fill="white" font-family="Arial" font-weight="bold" font-size="27">Fresh Basket</text>
+  <rect x="40" y="110" width="280" height="450" rx="20" fill="white"/>
+  <rect x="360" y="110" width="280" height="450" rx="20" fill="white"/>
+  <rect x="680" y="110" width="280" height="450" rx="20" fill="white"/>
+  <rect x="70" y="140" width="220" height="210" rx="14" fill="#e4cbbd"/>
+  <path d="M90 250 C140 155 215 330 276 188 L276 330 L90 330Z" fill="#e98975"/>
+  <text x="70" y="392" font-family="Arial" font-size="18" fill="#6b756f">NORTH COAST</text>
+  <text x="70" y="425" font-family="Arial" font-weight="bold" font-size="25" fill="#26332e">Wild salmon fillet</text>
+  <text x="70" y="462" font-family="Arial" font-size="18" fill="#6b756f">Fresh · Skin-on</text>
+  <text x="70" y="525" font-family="Arial" font-weight="bold" font-size="25" fill="#26332e">$14.99</text>
+  <rect x="390" y="140" width="220" height="210" rx="14" fill="#eee7da"/>
+  <circle cx="500" cy="245" r="78" fill="#faf7eb" stroke="#d3c7a8" stroke-width="8"/>
+  <text x="390" y="392" font-family="Arial" font-size="18" fill="#6b756f">MAISON BELLE</text>
+  <text x="390" y="425" font-family="Arial" font-weight="bold" font-size="25" fill="#26332e">Soft-ripened cheese</text>
+  <text x="390" y="462" font-family="Arial" font-size="18" fill="#6b756f">Imported · 200 g</text>
+  <text x="390" y="525" font-family="Arial" font-weight="bold" font-size="25" fill="#26332e">$8.49</text>
+  <rect x="710" y="140" width="220" height="210" rx="14" fill="#ddd2c6"/>
+  <rect x="770" y="165" width="100" height="165" rx="16" fill="#6a4635"/>
+  <text x="790" y="230" fill="white" font-family="Arial" font-weight="bold" font-size="15">COLD</text>
+  <text x="790" y="250" fill="white" font-family="Arial" font-weight="bold" font-size="15">BREW</text>
+  <text x="710" y="392" font-family="Arial" font-size="18" fill="#6b756f">MORNING OAK</text>
+  <text x="710" y="425" font-family="Arial" font-weight="bold" font-size="25" fill="#26332e">Cold brew concentrate</text>
+  <text x="710" y="462" font-family="Arial" font-size="18" fill="#6b756f">Coffee · 946 mL</text>
+  <text x="710" y="525" font-family="Arial" font-weight="bold" font-size="25" fill="#26332e">$11.99</text>
+</svg>

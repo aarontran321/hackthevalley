@@ -1,0 +1,56 @@
+[
+  {
+    "id": "HC-LISTERIA-01",
+    "title": "Listeria and food safety during pregnancy",
+    "organization": "Health Canada",
+    "url": "https://www.canada.ca/en/public-health/services/diseases/listeriosis/pregnant-women.html",
+    "topic": "Listeria",
+    "summary": "Pregnant people should avoid unpasteurized dairy products and heat higher-risk ready-to-eat foods, including deli meats, until steaming hot.",
+    "applicableRisks": ["unpasteurized", "soft cheese", "deli meat", "listeria"]
+  },
+  {
+    "id": "FDA-FISH-01",
+    "title": "Advice about eating fish",
+    "organization": "U.S. Food & Drug Administration",
+    "url": "https://www.fda.gov/food/consumers/advice-about-eating-fish",
+    "topic": "Fish and mercury",
+    "summary": "People who are pregnant should choose lower-mercury fish and eat 2 to 3 servings a week from the Best Choices list while avoiding fish with the highest mercury levels.",
+    "applicableRisks": ["fish", "mercury", "tuna", "seafood"]
+  },
+  {
+    "id": "NHS-FOODS-01",
+    "title": "Foods to avoid in pregnancy",
+    "organization": "NHS",
+    "url": "https://www.nhs.uk/pregnancy/keeping-well/foods-to-avoid/",
+    "topic": "Pregnancy food safety",
+    "summary": "Guidance covers pasteurization, raw or undercooked animal products, certain fish, caffeine, and washing produce during pregnancy.",
+    "applicableRisks": ["raw egg", "undercooked", "unpasteurized", "caffeine", "liver", "fish"]
+  },
+  {
+    "id": "ACOG-NUTRITION-01",
+    "title": "Nutrition During Pregnancy",
+    "organization": "American College of Obstetricians and Gynecologists",
+    "url": "https://www.acog.org/womens-health/faqs/nutrition-during-pregnancy",
+    "topic": "Pregnancy nutrition",
+    "summary": "A varied diet during pregnancy should include protein, iron, folic acid, calcium, vitamin D, choline, and omega-3 fatty acids; individual needs should be discussed with a clinician.",
+    "applicableRisks": ["iron", "folate", "calcium", "protein", "nutrition"]
+  },
+  {
+    "id": "ACOG-CAFFEINE-01",
+    "title": "Moderate Caffeine Consumption During Pregnancy",
+    "organization": "American College of Obstetricians and Gynecologists",
+    "url": "https://www.acog.org/clinical/clinical-guidance/committee-opinion/articles/2010/08/moderate-caffeine-consumption-during-pregnancy",
+    "topic": "Caffeine",
+    "summary": "Moderate caffeine consumption below 200 mg per day does not appear to be a major contributing factor in miscarriage or preterm birth; total intake across sources matters.",
+    "applicableRisks": ["caffeine", "coffee", "tea", "energy drink", "chocolate"]
+  },
+  {
+    "id": "CDC-FOOD-01",
+    "title": "Safer Food Choices for Pregnant People",
+    "organization": "Centers for Disease Control and Prevention",
+    "url": "https://www.cdc.gov/food-safety/foods/pregnant-people.html",
+    "topic": "Foodborne illness",
+    "summary": "Pregnancy increases the risk from some foodborne illnesses. Safer choices include pasteurized dairy and thoroughly cooked meat, eggs, seafood, and sprouts.",
+    "applicableRisks": ["raw", "undercooked", "sprouts", "unpasteurized", "foodborne illness"]
+  }
+]
