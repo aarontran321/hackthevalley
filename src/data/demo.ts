@@ -16,7 +16,7 @@ export const demoAnalyses: FoodAnalysis[] = [
     alternatives: [{ name: "Plain Greek yogurt with fresh berries", reason: "Similar creamy option with control over added sugar." }],
     questionsForProvider: ["Do my individual calcium needs require any changes to my usual diet?"],
     confidence: 0.92,
-    sourceIds: ["ACOG-NUTRITION-01", "HC-LISTERIA-01"],
+    sourceIds: ["ACOG-NUTRITION-01", "FDA-RAWMILK-2024"],
     limitations: ["Pasteurization and cold-chain storage cannot be verified from a photo alone."],
     nutrition: { calories: 160, protein: 15, calcium: 180, sugar: 9 },
     isDemo: true,
@@ -35,7 +35,7 @@ export const demoAnalyses: FoodAnalysis[] = [
     alternatives: [{ name: "Half-caf iced latte", reason: "Keeps a similar coffee ritual with less caffeine; confirm milk is pasteurized." }],
     questionsForProvider: ["What caffeine limit is appropriate for my pregnancy and health history?"],
     confidence: 0.86,
-    sourceIds: ["ACOG-CAFFEINE-01", "NHS-FOODS-01"],
+    sourceIds: ["ACOG-CAFFEINE-2010"],
     limitations: ["The drink’s exact caffeine content is unknown."],
     nutrition: { calories: 20, caffeine: 210 },
     isDemo: true,
@@ -54,7 +54,7 @@ export const demoAnalyses: FoodAnalysis[] = [
     alternatives: [{ name: "Pasteurized baked brie", reason: "A similar option when clearly labeled pasteurized and heated until steaming hot." }],
     questionsForProvider: ["What should I do if I already ate an unpasteurized product and feel unwell?"],
     confidence: 0.94,
-    sourceIds: ["HC-LISTERIA-01", "CDC-FOOD-01"],
+    sourceIds: ["NHS-SOFTCHEESE-2023", "FDA-LISTERIA-2022"],
     limitations: ["The demo assumes the package is labeled unpasteurized."],
     nutrition: { calories: 110, protein: 6, calcium: 100 },
     isDemo: true,
@@ -63,7 +63,7 @@ export const demoAnalyses: FoodAnalysis[] = [
 ];
 
 export const demoScreenshotItems: ScreenshotItem[] = [
-  { name: "Wild-caught salmon fillet", brand: "North Coast", visibleDetails: ["Fresh", "Skin-on"], locationInImage: "Top left card", confidence: 0.96, analysis: { ...demoAnalyses[0], id: "demo-salmon", itemName: "Cooked salmon fillet", summary: "Generally suitable when cooked thoroughly; salmon is a lower-mercury fish choice.", explanation: "Salmon can contribute protein and omega-3 fats. Cook it thoroughly and follow local storage guidance.", sourceIds: ["FDA-FISH-01", "CDC-FOOD-01"] } },
+  { name: "Wild-caught salmon fillet", brand: "North Coast", visibleDetails: ["Fresh", "Skin-on"], locationInImage: "Top left card", confidence: 0.96, analysis: { ...demoAnalyses[0], id: "demo-salmon", itemName: "Cooked salmon fillet", summary: "Generally suitable when cooked thoroughly; salmon is a lower-mercury fish choice.", explanation: "Salmon can contribute protein and omega-3 fats. Cook it thoroughly and follow local storage guidance.", sourceIds: ["FDA-MERCURY-2021", "CDC-SAFERFOOD-2025"] } },
   { name: "Imported soft-ripened cheese", brand: "Maison Belle", visibleDetails: ["Soft cheese", "Pasteurization not visible"], locationInImage: "Top right card", confidence: 0.89, analysis: demoAnalyses[2] },
   { name: "Cold brew concentrate", brand: "Morning Oak", visibleDetails: ["Coffee concentrate", "946 mL"], locationInImage: "Bottom left card", confidence: 0.93, analysis: demoAnalyses[1] }
 ];
@@ -80,7 +80,7 @@ export const demoEntries: ConsumptionEntry[] = [
   { id: "log-2", itemName: "Spinach and lentil salad", timestamp: daysAgo(1, 12), mealType: "lunch", quantity: "1 large bowl", safetyStatus: "generally_suitable", flaggedIngredients: [], estimatedNutrients: { calories: 410, protein: 20, iron: 6, calcium: 140, folate: 210 }, originalAnalysis: { ...demoAnalyses[0], id: "demo-lentils", itemName: "Spinach and lentil salad" } },
   { id: "log-3", itemName: "Half-caf iced latte", timestamp: daysAgo(1, 15), mealType: "snack", quantity: "12 oz", safetyStatus: "generally_suitable", flaggedIngredients: ["Caffeine"], estimatedNutrients: { calories: 130, protein: 7, calcium: 220, caffeine: 65, sugar: 10 }, originalAnalysis: demoAnalyses[1] },
   { id: "log-4", itemName: "Cooked salmon rice bowl", timestamp: daysAgo(2, 19), mealType: "dinner", quantity: "1 bowl", safetyStatus: "generally_suitable", flaggedIngredients: [], estimatedNutrients: { calories: 540, protein: 32, iron: 2, calcium: 45, folate: 38 }, originalAnalysis: demoScreenshotItems[0].analysis! },
-  { id: "log-5", itemName: "Deli turkey sandwich", timestamp: daysAgo(3, 12), mealType: "lunch", quantity: "1 sandwich", safetyStatus: "use_caution", flaggedIngredients: ["Deli meat"], estimatedNutrients: { calories: 430, protein: 25, iron: 3, calcium: 120 }, originalAnalysis: { ...demoAnalyses[1], id: "demo-deli", itemName: "Deli turkey sandwich", summary: "Use caution unless the deli meat was heated until steaming hot.", flaggedIngredients: [{ ingredient: "Deli turkey", reason: "Ready-to-eat deli meat may carry Listeria; heating reduces risk." }], sourceIds: ["HC-LISTERIA-01"] } },
+  { id: "log-5", itemName: "Deli turkey sandwich", timestamp: daysAgo(3, 12), mealType: "lunch", quantity: "1 sandwich", safetyStatus: "use_caution", flaggedIngredients: ["Deli meat"], estimatedNutrients: { calories: 430, protein: 25, iron: 3, calcium: 120 }, originalAnalysis: { ...demoAnalyses[1], id: "demo-deli", itemName: "Deli turkey sandwich", summary: "Use caution unless the deli meat was heated until steaming hot.", flaggedIngredients: [{ ingredient: "Deli turkey", reason: "Ready-to-eat deli meat may carry Listeria; heating reduces risk." }], sourceIds: ["FDA-LISTERIA-2022"] } },
   { id: "log-6", itemName: "Banana and peanut butter toast", timestamp: daysAgo(4, 8), mealType: "breakfast", quantity: "2 slices", safetyStatus: "generally_suitable", flaggedIngredients: [], estimatedNutrients: { calories: 390, protein: 12, iron: 2, calcium: 60, folate: 45, sugar: 14 }, originalAnalysis: demoAnalyses[0] }
 ];
 
