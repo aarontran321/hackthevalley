@@ -31,7 +31,19 @@ const model = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 
 const client = () => {
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_NOT_CONFIGURED");
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  // Vertex AI path (fe63c3b): an Express Mode key sets only the flag; full
+  // Vertex with Application Default Credentials also needs project/location.
+  const useVertexAI = process.env.GOOGLE_GENAI_USE_VERTEXAI === "true";
+  return new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    vertexai: useVertexAI,
+    ...(useVertexAI && process.env.GOOGLE_CLOUD_PROJECT
+      ? {
+          project: process.env.GOOGLE_CLOUD_PROJECT,
+          location: process.env.GOOGLE_CLOUD_LOCATION || "global"
+        }
+      : {})
+  });
 };
 
 /** Whole corpus, for the calls that reason over a food log rather than one item. */
@@ -310,7 +322,13 @@ export async function chatAboutAnalysis(profile: UserProfile, analysis: FoodAnal
   const response = await withRetry(() =>
     client().models.generateContent({
       model,
-      contents: `Profile: ${JSON.stringify(profile)}\nAnalysis: ${JSON.stringify(analysis)}\nApproved sources: ${allSourcesText}\nConversation: ${JSON.stringify(messages)}\nAnswer the latest question in 2-4 calm, plain-language paragraphs. Use only the supplied context and source summaries. Say when information is unknown.`,
+      // Conversational voice from fe63c3b: short and direct beats a report.
+      contents: `You are having a one-on-one conversation, not writing a report. Answer the latest question directly in a warm, natural voice. Use 2-5 short sentences and no more than 110 words. Do not repeat the user's question, recap the full analysis, list unrelated guidance, or over-explain. Cite at most two relevant supplied source IDs in one brief final parenthetical. If the user asks a broader pregnancy food, drink, or supplement question, answer it when the supplied sources support it. When they do not, say so briefly and suggest the most relevant qualified professional.
+
+Profile: ${JSON.stringify(profile)}
+Current food analysis: ${JSON.stringify(analysis)}
+Approved sources: ${allSourcesText}
+Conversation: ${JSON.stringify(messages)}`,
       config: { systemInstruction: system },
     }),
   );

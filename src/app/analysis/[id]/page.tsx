@@ -73,16 +73,14 @@ export default function AnalysisPage() {
     if (!question.trim()) return;
     const next = [...chat, { role: "user" as const, content: question.trim() }];
     setChat(next); setQuestion(""); setAsking(true); setError("");
-    if (analysis.isDemo) {
-      await new Promise((resolve) => setTimeout(resolve, 550));
-      const ingredient = analysis.flaggedIngredients[0]?.ingredient;
-      setChat([...next, { role: "assistant", content: ingredient ? `The main reason for this result is ${ingredient.toLowerCase()}. ${analysis.moderationGuidance || analysis.explanation} Because the exact product and your individual health context can matter, confirm an important decision with your obstetrician, midwife, dietitian, or another qualified professional.` : `${analysis.summary} ${analysis.moderationGuidance || ""} If you need advice for your individual pregnancy, a qualified healthcare professional can help.` }]);
-      setAsking(false); return;
-    }
     try {
       const data = await apiPost<{ message: string }>("/api/chat", { profile: storage.profile(), analysis, messages: next });
       setChat([...next, { role: "assistant", content: data.message }]);
-    } catch (e) { setError(e instanceof Error ? e.message : "Chat is unavailable right now."); }
+    } catch (e) {
+      setChat(chat);
+      setQuestion(next.at(-1)?.content || "");
+      setError(e instanceof Error ? e.message : "Chat is unavailable right now.");
+    }
     finally { setAsking(false); }
   };
 
