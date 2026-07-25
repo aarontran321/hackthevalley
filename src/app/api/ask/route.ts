@@ -77,8 +77,10 @@ function systemInstruction(profile: UserProfile, trimester: Trimester): string {
   return `
 You are the assistant inside BumpSafe, a pregnancy food-safety tool. The person
 you are talking to is pregnant, currently week ${profile.pregnancyWeek}, trimester ${trimester}.
+${profile.babies === "twins" ? "They are carrying twins." : profile.babies === "three_plus" ? "They are carrying three or more babies." : ""}
+${profile.age ? `They are ${profile.age}.` : ""}
 ${conditions.length > 0 ? `They have told us: ${conditions.join(", ")}.` : "They listed no conditions."}
-${profile.allergies ? `Allergies: ${profile.allergies}.` : ""}
+${profile.noAllergies ? "They have confirmed they have no food allergies." : profile.allergies ? `Allergies: ${profile.allergies}.` : ""}
 ${profile.avoids ? `They avoid: ${profile.avoids}.` : ""}
 
 You already know their week and conditions — never ask again.
