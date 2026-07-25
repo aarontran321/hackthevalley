@@ -62,7 +62,20 @@ Add a server-side Gemini API key:
 ```env
 GEMINI_API_KEY=your_key_here
 GEMINI_MODEL=gemini-3.6-flash
+GOOGLE_GENAI_USE_VERTEXAI=false
 ```
+
+To use a Vertex AI Express Mode API key instead, set:
+
+```env
+GEMINI_API_KEY=your_vertex_express_key
+GEMINI_MODEL=gemini-3.6-flash
+GOOGLE_GENAI_USE_VERTEXAI=true
+```
+
+For full Vertex AI authentication with Application Default Credentials, also set
+`GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION=global`, enable the Vertex AI
+API, and run `gcloud auth application-default login` locally.
 
 Run the development server:
 
