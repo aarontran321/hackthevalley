@@ -18,20 +18,90 @@ import { useStoredValue } from "@/components/use-storage";
 import { DEFAULT_PROFILE, storage } from "@/lib/storage";
 import { activityTotals, mergeRecentFoods } from "@/lib/recent-foods";
 import {
-  estimatedDueDate,
+  dueDateFor,
+  parseISODate,
   trimesterForWeek,
+  weekFor,
   weeksRemaining,
+  type BabyCount,
+  type DateBasis,
+  type UnitSystem,
   type UserProfile
 } from "@/types";
 
-const conditions = ["Gestational diabetes", "High blood pressure", "Anaemia or low iron", "Other condition"];
+const conditions = ["Gestational diabetes", "High blood pressure", "Anaemia or low iron"];
 const diets = ["Vegetarian", "Vegan", "Halal", "Kosher", "Dairy-free", "Gluten-free"];
 
+type ChipField = "healthConditions" | "dietaryPreferences";
+// Anything stored outside these lists is what the person typed under "Other".
+const presets: Record<ChipField, string[]> = { healthConditions: conditions, dietaryPreferences: diets };
+
 const sourceLabels = { scanned: "Scanned", logged: "Logged" } as const;
+
+const basisOptions: Array<{ id: DateBasis; label: string }> = [
+  { id: "due", label: "Due date" },
+  { id: "lmp", label: "Last period" }
+];
+const babyOptions: Array<{ id: BabyCount; label: string }> = [
+  { id: "one", label: "One" },
+  { id: "twins", label: "Twins" },
+  { id: "three_plus", label: "Three+" }
+];
+const unitOptions: Array<{ id: UnitSystem; label: string }> = [
+  { id: "metric", label: "cm / kg" },
+  { id: "imperial", label: "ft / lb" }
+];
+
+type TabId = "pregnancy" | "body" | "diet";
+const tabs: Array<{ id: TabId; label: string }> = [
+  { id: "pregnancy", label: "Pregnancy" },
+  { id: "body", label: "Body" },
+  { id: "diet", label: "Diet" }
+];
+
+// Heights and weights are always stored metric; units are a display choice.
+const KG_PER_LB = 0.45359237;
+const CM_PER_IN = 2.54;
+const cmToFtIn = (cm: number) => {
+  const total = Math.round(cm / CM_PER_IN);
+  return { ft: Math.floor(total / 12), inches: total % 12 };
+};
+
+/** A weight in whichever unit is on show, stored back as kilograms. */
+function WeightInput({ kg, units, onChange }: { kg: number | null; units: UnitSystem; onChange: (kg: number | null) => void }) {
+  const imperial = units === "imperial";
+  const display = kg === null ? "" : imperial ? Math.round(kg / KG_PER_LB) : Math.round(kg * 10) / 10;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+      <input
+        className="input"
+        type="number"
+        min={imperial ? 66 : 30}
+        max={imperial ? 660 : 300}
+        value={display}
+        onChange={(event) => {
+          const raw = event.target.value;
+          if (raw === "") return onChange(null);
+          const value = Number(raw);
+          onChange(imperial ? value * KG_PER_LB : value);
+        }}
+      />
+      <span className="muted" style={{ fontSize: 14 }}>{imperial ? "lb" : "kg"}</span>
+    </div>
+  );
+}
+
+/** Explanatory line under a field label. */
+function Hint({ children }: { children: React.ReactNode }) {
+  return <p className="muted" style={{ fontSize: 13, lineHeight: 1.55, margin: "5px 0 9px" }}>{children}</p>;
+}
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [saved, setSaved] = useState(false);
+  const [tab, setTab] = useState<TabId>("pregnancy");
+  const [problem, setProblem] = useState<string | null>(null);
+  const [otherOpen, setOtherOpen] = useState<Record<ChipField, boolean>>({ healthConditions: false, dietaryPreferences: false });
   // Snapshot of what is actually persisted, so we can flag unsaved edits.
   const [committed, setCommitted] = useState<UserProfile>(DEFAULT_PROFILE);
 
@@ -59,7 +129,7 @@ export default function ProfilePage() {
     [analyses, entries]
   );
 
-  const toggle = (field: "healthConditions" | "dietaryPreferences", value: string) =>
+  const toggle = (field: ChipField, value: string) =>
     setProfile((current) => ({
       ...current,
       [field]: current[field].includes(value)
@@ -67,8 +137,65 @@ export default function ProfilePage() {
         : [...current[field], value]
     }));
 
+  // What the person typed under "Other", or "" when they have not used it.
+  const customFor = (field: ChipField) =>
+    profile[field].find((item) => !presets[field].includes(item)) ?? "";
+
+  // The typed text IS the stored value, so it reaches Gemini like any preset.
+  const setCustom = (field: ChipField, text: string) =>
+    setProfile((current) => {
+      const kept = current[field].filter((item) => presets[field].includes(item));
+      return { ...current, [field]: text.trim() ? [...kept, text] : kept };
+    });
+
+  const toggleOther = (field: ChipField) => {
+    if (otherOpen[field] || customFor(field)) {
+      setCustom(field, "");
+      setOtherOpen((current) => ({ ...current, [field]: false }));
+      return;
+    }
+    setOtherOpen((current) => ({ ...current, [field]: true }));
+  };
+
+  const otherChip = (field: ChipField, placeholder: string) => {
+    const custom = customFor(field);
+    const open = otherOpen[field] || Boolean(custom);
+    return (
+      <>
+        <button type="button" onClick={() => toggleOther(field)} className={`btn ${open ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }}>
+          {open && <Check size={15} />}Other
+        </button>
+        {open && (
+          <input
+            className="input"
+            /* Focus only when the chip was just clicked, never on page load. */
+            autoFocus={otherOpen[field]}
+            maxLength={60}
+            placeholder={placeholder}
+            value={custom}
+            onChange={(event) => setCustom(field, event.target.value)}
+            style={{ flex: "1 1 220px", minWidth: 190 }}
+          />
+        )}
+      </>
+    );
+  };
+
+  // Validated by hand rather than with `required`, because a native invalid
+  // field on a hidden tab blocks submit without being focusable or visible.
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    const fail = (target: TabId, message: string) => {
+      setTab(target);
+      setProblem(message);
+    };
+    if (!profile.name.trim()) return fail("pregnancy", "Add a display name.");
+    if (!parseISODate(profile.dateValue)) return fail("pregnancy", "Pick a date so we can work out how far along you are.");
+    if (!(profile.heightCm >= 100 && profile.heightCm <= 230)) return fail("body", "That height looks out of range.");
+    if (!(profile.prePregnancyWeightKg >= 30 && profile.prePregnancyWeightKg <= 300)) return fail("body", "That pre-pregnancy weight looks out of range.");
+    if (!(profile.age >= 12 && profile.age <= 60)) return fail("body", "That age looks out of range.");
+
+    setProblem(null);
     storage.saveProfile(profile);
     setCommitted(profile);
     setSaved(true);
@@ -107,8 +234,12 @@ export default function ProfilePage() {
     refreshEntries();
   };
 
-  const week = profile.pregnancyWeek;
-  const dueDate = estimatedDueDate(week);
+  // Derived live from the form state, so the header tracks edits before saving.
+  const week = weekFor(profile);
+  const dueDate = dueDateFor(profile);
+  const dueLabel = mounted && dueDate
+    ? dueDate.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })
+    : "—";
 
   return (
     <AppShell>
@@ -118,7 +249,7 @@ export default function ProfilePage() {
           <h1 className="title" style={{ margin: "10px 0 12px" }}>Guidance that starts with you.</h1>
           <p className="subtitle" style={{ margin: "0 0 28px" }}>These details personalize educational guidance. They stay in this browser for the MVP and are not used to diagnose or assess your weight.</p>
 
-          <section className="card card-pad" style={{ background: "linear-gradient(110deg,#e2ebdf,#f4e2dd)", marginBottom: 20 }}>
+          <section className="card card-pad" style={{ background: "#e7dfe0", marginBottom: 20 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span style={{ width: 54, height: 54, display: "grid", placeItems: "center", background: "rgba(255,255,255,.6)", borderRadius: 18, fontFamily: "Georgia,serif", fontSize: 24 }}>
@@ -136,7 +267,7 @@ export default function ProfilePage() {
                 <span style={{ fontSize: 14 }}>
                   <b>Estimated due date</b>
                   <br />
-                  <small className="muted">{mounted ? dueDate.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }) : "—"}</small>
+                  <small className="muted">{dueLabel}</small>
                 </span>
               </div>
             </div>
@@ -212,31 +343,174 @@ export default function ProfilePage() {
               {dirty && <span className="muted" style={{ fontSize: 13 }}>Unsaved changes</span>}
             </div>
 
-            <div className="grid-2">
-              <label><span className="label">Display name</span><input className="input" required maxLength={60} value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} /></label>
-              <label><span className="label">Current pregnancy week</span><input className="input" type="number" min={1} max={42} required value={profile.pregnancyWeek} onChange={(e) => setProfile({ ...profile, pregnancyWeek: Number(e.target.value) })} /></label>
-              <label><span className="label">Height (cm)</span><input className="input" type="number" min={100} max={230} required value={profile.heightCm} onChange={(e) => setProfile({ ...profile, heightCm: Number(e.target.value) })} /></label>
-              <label><span className="label">Weight (kg)</span><input className="input" type="number" min={30} max={300} required value={profile.weightKg} onChange={(e) => setProfile({ ...profile, weightKg: Number(e.target.value) })} /></label>
+            <label style={{ display: "block", marginBottom: 22 }}>
+              <span className="label">Display name</span>
+              <input className="input" maxLength={60} value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} />
+            </label>
+
+            <div role="tablist" aria-label="Profile sections" style={{ display: "flex", gap: 7, borderBottom: "1px solid var(--line)", marginBottom: 24 }}>
+              {tabs.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === item.id}
+                  onClick={() => setTab(item.id)}
+                  style={{
+                    border: 0,
+                    background: "transparent",
+                    cursor: "pointer",
+                    padding: "10px 16px",
+                    fontSize: 15,
+                    fontWeight: tab === item.id ? 700 : 500,
+                    color: tab === item.id ? "var(--ink)" : "var(--muted)",
+                    borderBottom: `2px solid ${tab === item.id ? "#8d6d71" : "transparent"}`,
+                    marginBottom: -1
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
-            <div style={{ background: "var(--sage)", borderRadius: 15, padding: 16, margin: "20px 0 26px", display: "flex", gap: 12 }}>
-              <HeartHandshake size={21} /><span><b>Week {week} · Trimester {trimesterForWeek(week)}</b><br /><small>Calculated from your pregnancy week.{mounted ? ` Estimated due date ${dueDate.toLocaleDateString()}.` : ""}</small></span>
-            </div>
-            <fieldset style={{ border: 0, padding: 0, margin: "0 0 25px" }}>
-              <legend className="label">Health context <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></legend>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
-                {conditions.map((item) => <button type="button" onClick={() => toggle("healthConditions", item)} className={`btn ${profile.healthConditions.includes(item) ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }} key={item}>{profile.healthConditions.includes(item) && <Check size={15} />}{item}</button>)}
+
+            {problem && (
+              <div className="notice" style={{ marginBottom: 20, color: "#8a5250" }}>{problem}</div>
+            )}
+
+            {tab === "pregnancy" && (
+              <div role="tabpanel">
+                <fieldset style={{ border: 0, padding: 0, margin: "0 0 22px" }}>
+                  <legend className="label">How would you like to tell me how far along you are?</legend>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginTop: 9 }}>
+                    {basisOptions.map((option) => (
+                      <button key={option.id} type="button" onClick={() => setProfile({ ...profile, dateBasis: option.id })} className={`btn ${profile.dateBasis === option.id ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }}>
+                        {profile.dateBasis === option.id && <Check size={15} />}{option.label}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <label style={{ display: "block", marginBottom: 22 }}>
+                  <span className="label">{profile.dateBasis === "due" ? "Estimated due date" : "First day of your last period"}</span>
+                  <Hint>
+                    {profile.dateBasis === "due"
+                      ? "From your dating scan if you’ve had one — that’s the more accurate figure."
+                      : "Counting starts here: your due date is 40 weeks from this day."}
+                  </Hint>
+                  <input className="input" type="date" value={profile.dateValue} onChange={(e) => setProfile({ ...profile, dateValue: e.target.value })} />
+                </label>
+
+                <div style={{ background: "var(--sage)", borderRadius: 15, padding: 16, margin: "0 0 26px", display: "flex", gap: 12 }}>
+                  <HeartHandshake size={21} />
+                  <span>
+                    <b>Week {week} · Trimester {trimesterForWeek(week)}</b>
+                    <br />
+                    <small>{dueDate ? `Estimated due date ${dueLabel} · ${weeksRemaining(week)} weeks to go.` : "Pick a date above and this fills in."}</small>
+                  </span>
+                </div>
+
+                <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+                  <legend className="label">How many babies?</legend>
+                  <Hint>This one tap changes almost every number that follows, so it’s worth getting right.</Hint>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
+                    {babyOptions.map((option) => (
+                      <button key={option.id} type="button" onClick={() => setProfile({ ...profile, babies: option.id })} className={`btn ${profile.babies === option.id ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }}>
+                        {profile.babies === option.id && <Check size={15} />}{option.label}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
               </div>
-            </fieldset>
-            <fieldset style={{ border: 0, padding: 0, margin: "0 0 25px" }}>
-              <legend className="label">Dietary preferences</legend>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
-                {diets.map((item) => <button type="button" onClick={() => toggle("dietaryPreferences", item)} className={`btn ${profile.dietaryPreferences.includes(item) ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }} key={item}>{profile.dietaryPreferences.includes(item) && <Check size={15} />}{item}</button>)}
+            )}
+
+            {tab === "body" && (
+              <div role="tabpanel">
+                <fieldset style={{ border: 0, padding: 0, margin: "0 0 22px" }}>
+                  <legend className="label">Units</legend>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginTop: 9 }}>
+                    {unitOptions.map((option) => (
+                      <button key={option.id} type="button" onClick={() => setProfile({ ...profile, units: option.id })} className={`btn ${profile.units === option.id ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }}>
+                        {profile.units === option.id && <Check size={15} />}{option.label}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <div style={{ marginBottom: 22 }}>
+                  <span className="label">Height</span>
+                  {profile.units === "metric" ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 7 }}>
+                      <input className="input" type="number" min={100} max={230} value={profile.heightCm} onChange={(e) => setProfile({ ...profile, heightCm: Number(e.target.value) })} />
+                      <span className="muted" style={{ fontSize: 14 }}>cm</span>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 7 }}>
+                      <input className="input" type="number" min={3} max={7} aria-label="Height, feet" value={cmToFtIn(profile.heightCm).ft} onChange={(e) => setProfile({ ...profile, heightCm: (Number(e.target.value) * 12 + cmToFtIn(profile.heightCm).inches) * CM_PER_IN })} />
+                      <span className="muted" style={{ fontSize: 14 }}>ft</span>
+                      <input className="input" type="number" min={0} max={11} aria-label="Height, inches" value={cmToFtIn(profile.heightCm).inches} onChange={(e) => setProfile({ ...profile, heightCm: (cmToFtIn(profile.heightCm).ft * 12 + Number(e.target.value)) * CM_PER_IN })} />
+                      <span className="muted" style={{ fontSize: 14 }}>in</span>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ marginBottom: 22 }}>
+                  <span className="label">Pre-pregnancy weight</span>
+                  <Hint>Your weight BEFORE this pregnancy — not what you weigh now. The recommended weight-gain range is keyed on this, so using today’s weight would shift the whole band.</Hint>
+                  <WeightInput kg={profile.prePregnancyWeightKg} units={profile.units} onChange={(kg) => setProfile({ ...profile, prePregnancyWeightKg: kg ?? 0 })} />
+                </div>
+
+                <div style={{ marginBottom: 22 }}>
+                  <span className="label">Current weight <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>
+                  <Hint>Optional, and editable any time. Used to plot gain against the recommended range.</Hint>
+                  <WeightInput kg={profile.currentWeightKg} units={profile.units} onChange={(kg) => setProfile({ ...profile, currentWeightKg: kg })} />
+                </div>
+
+                <div>
+                  <span className="label">Age</span>
+                  <Hint>Under 19 raises the calcium target — your own bones are still building.</Hint>
+                  <input className="input" type="number" min={12} max={60} value={profile.age} onChange={(e) => setProfile({ ...profile, age: Number(e.target.value) })} />
+                </div>
               </div>
-            </fieldset>
-            <div className="grid-2">
-              <label><span className="label">Food allergies</span><input className="input" placeholder="e.g. peanuts, shellfish" value={profile.allergies} onChange={(e) => setProfile({ ...profile, allergies: e.target.value })} /></label>
-              <label><span className="label">Foods or ingredients you avoid</span><input className="input" placeholder="e.g. mushrooms" value={profile.avoids} onChange={(e) => setProfile({ ...profile, avoids: e.target.value })} /></label>
-            </div>
+            )}
+
+            {tab === "diet" && (
+              <div role="tabpanel">
+                <fieldset style={{ border: 0, padding: 0, margin: "0 0 25px" }}>
+                  <legend className="label">Health context <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></legend>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginTop: 9 }}>
+                    {conditions.map((item) => <button type="button" onClick={() => toggle("healthConditions", item)} className={`btn ${profile.healthConditions.includes(item) ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }} key={item}>{profile.healthConditions.includes(item) && <Check size={15} />}{item}</button>)}
+                    {otherChip("healthConditions", "e.g. thyroid condition")}
+                  </div>
+                </fieldset>
+                <fieldset style={{ border: 0, padding: 0, margin: "0 0 25px" }}>
+                  <legend className="label">Dietary preferences <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></legend>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginTop: 9 }}>
+                    {diets.map((item) => <button type="button" onClick={() => toggle("dietaryPreferences", item)} className={`btn ${profile.dietaryPreferences.includes(item) ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }} key={item}>{profile.dietaryPreferences.includes(item) && <Check size={15} />}{item}</button>)}
+                    {otherChip("dietaryPreferences", "e.g. pescatarian")}
+                  </div>
+                </fieldset>
+                <div style={{ marginBottom: 22 }}>
+                  <span className="label">Food allergies <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginTop: 9 }}>
+                    <button type="button" onClick={() => setProfile({ ...profile, noAllergies: !profile.noAllergies, allergies: profile.noAllergies ? profile.allergies : "" })} className={`btn ${profile.noAllergies ? "btn-soft" : "btn-outline"}`} style={{ minHeight: 40, paddingInline: 14 }}>
+                      {profile.noAllergies && <Check size={15} />}No food allergies
+                    </button>
+                    <input
+                      className="input"
+                      placeholder={profile.noAllergies ? "None" : "e.g. peanuts, shellfish"}
+                      disabled={profile.noAllergies}
+                      value={profile.allergies}
+                      onChange={(e) => setProfile({ ...profile, allergies: e.target.value })}
+                      style={{ flex: "1 1 220px", minWidth: 190, opacity: profile.noAllergies ? 0.55 : 1 }}
+                    />
+                  </div>
+                </div>
+                <label style={{ display: "block" }}>
+                  <span className="label">Foods or ingredients you avoid <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>
+                  <input className="input" placeholder="e.g. mushrooms" value={profile.avoids} onChange={(e) => setProfile({ ...profile, avoids: e.target.value })} />
+                </label>
+              </div>
+            )}
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 28 }}><button className="btn btn-primary" type="submit" disabled={!dirty && !saved}>{saved ? <><Check size={18} /> Saved</> : "Save profile"}</button></div>
           </form>
 

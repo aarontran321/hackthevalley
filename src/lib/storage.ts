@@ -1,17 +1,45 @@
 "use client";
 
 import { demoEntries } from "@/data/demo";
-import type { ConsumptionEntry, FoodAnalysis, UserProfile, WeeklySummary } from "@/types";
+import { weekFor, type ConsumptionEntry, type FoodAnalysis, type UserProfile, type WeeklySummary } from "@/types";
 
 export const DEFAULT_PROFILE: UserProfile = {
   name: "Maya",
   pregnancyWeek: 31,
+  dateBasis: "due",
+  dateValue: "",
+  babies: "one",
+  units: "metric",
   heightCm: 165,
-  weightKg: 68,
+  prePregnancyWeightKg: 68,
+  currentWeightKg: null,
+  age: 30,
   healthConditions: [],
   dietaryPreferences: [],
   allergies: "",
+  noAllergies: false,
   avoids: ""
+};
+
+/** Profiles saved before a field existed are missing it, so fill the gaps and
+ *  recompute the week rather than trusting whatever was stored. */
+const round1 = (value: number) => Math.round(value * 10) / 10;
+
+const hydrateProfile = (stored: Partial<UserProfile>): UserProfile => {
+  const merged = { ...DEFAULT_PROFILE, ...stored };
+  // Rebuild from the known keys so fields retired in older versions do not
+  // ride along into the payload the model sees.
+  const clean = Object.fromEntries(
+    Object.keys(DEFAULT_PROFILE).map((key) => [key, merged[key as keyof UserProfile]])
+  ) as UserProfile;
+  return {
+    ...clean,
+    pregnancyWeek: weekFor(clean),
+    // Unit conversions leave long floats behind; nobody needs 72.57477920000001 kg.
+    heightCm: round1(clean.heightCm),
+    prePregnancyWeightKg: round1(clean.prePregnancyWeightKg),
+    currentWeightKg: clean.currentWeightKg === null ? null : round1(clean.currentWeightKg)
+  };
 };
 
 const read = <T>(key: string, fallback: T): T => {
@@ -35,8 +63,8 @@ const drop = (...keys: string[]) => {
 };
 
 export const storage = {
-  profile: () => read<UserProfile>("bumpsafe-profile", DEFAULT_PROFILE),
-  saveProfile: (profile: UserProfile) => write("bumpsafe-profile", profile),
+  profile: () => hydrateProfile(read<Partial<UserProfile>>("bumpsafe-profile", DEFAULT_PROFILE)),
+  saveProfile: (profile: UserProfile) => write("bumpsafe-profile", hydrateProfile(profile)),
   analyses: () => read<FoodAnalysis[]>("bumpsafe-analyses", []),
   saveAnalysis: (analysis: FoodAnalysis) => {
     const existing = read<FoodAnalysis[]>("bumpsafe-analyses", []);
@@ -66,7 +94,7 @@ export const storage = {
   /** Everything this browser holds, for the profile's export action. */
   exportAll: () => ({
     exportedAt: new Date().toISOString(),
-    profile: read<UserProfile>("bumpsafe-profile", DEFAULT_PROFILE),
+    profile: hydrateProfile(read<Partial<UserProfile>>("bumpsafe-profile", DEFAULT_PROFILE)),
     analyses: read<FoodAnalysis[]>("bumpsafe-analyses", []),
     entries: read<ConsumptionEntry[]>("bumpsafe-entries", []),
     summary: read<WeeklySummary | null>("bumpsafe-summary", null)
