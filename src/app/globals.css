@@ -71,3 +71,166 @@ a { color: inherit; text-decoration: none; }
   .page { padding: 0; }
   .card { box-shadow: none; break-inside: avoid; }
 }
+
+/* ---------------------------------------------------------------------------
+   Ask panel — a button anywhere in the app, sliding in from the right.
+   --------------------------------------------------------------------------- */
+
+.ask-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--sage-dark);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(38, 51, 46, 0.18);
+}
+
+.ask-fab:hover { filter: brightness(1.06); }
+
+.ask-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(38, 51, 46, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.ask-scrim.is-open { opacity: 1; pointer-events: auto; }
+
+.ask-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 100vw);
+  height: 100dvh;
+  background: var(--card);
+  border-left: 1px solid var(--line);
+  transform: translateX(100%);
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: -12px 0 40px rgba(38, 51, 46, 0.12);
+}
+
+.ask-panel.is-open { transform: translateX(0); }
+
+.ask-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ask-close {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 0;
+}
+
+.ask-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ask-suggestions { display: flex; flex-direction: column; gap: 8px; }
+
+.ask-suggestions button {
+  text-align: left;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--cream);
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.ask-suggestions button:hover { border-color: var(--sage-dark); }
+
+.ask-turn { display: flex; flex-direction: column; gap: 6px; }
+.ask-turn.is-user { align-items: flex-end; }
+
+.ask-bubble { margin: 0; line-height: 1.55; white-space: pre-wrap; }
+
+.ask-turn.is-user .ask-bubble {
+  background: var(--sage-dark);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 14px 14px 4px 14px;
+  max-width: 85%;
+}
+
+/* The trace is the point: it shows where the answer came from. */
+.ask-trace { list-style: none; margin: 0; padding: 0; }
+.ask-trace li { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.ask-degraded {
+  margin: 0;
+  font-size: 12.5px;
+  color: #8a5a12;
+  background: var(--peach);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.ask-form {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+  background: var(--card);
+}
+
+.ask-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+  background: #fff;
+  color: var(--ink);
+}
+
+.ask-form button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--sage-dark);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ask-form button:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-panel, .ask-scrim { transition: none; }
+}
+
+@media print {
+  .ask-fab, .ask-panel, .ask-scrim { display: none !important; }
+}
