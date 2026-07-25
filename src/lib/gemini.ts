@@ -29,21 +29,38 @@ import type { ConsumptionEntry, FoodAnalysis, UserProfile, WeeklySummary } from 
  */
 const model = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 
+/**
+ * Three ways in, and the SDK treats two of them as mutually exclusive:
+ * passing project/location together with an API key throws
+ * "Project/location and API key are mutually exclusive in the client
+ * initializer". So pick exactly one mode rather than merging the two.
+ *
+ *   1. Vertex Express  GOOGLE_GENAI_USE_VERTEXAI=true + GEMINI_API_KEY
+ *   2. Vertex with ADC GOOGLE_GENAI_USE_VERTEXAI=true + GOOGLE_CLOUD_PROJECT,
+ *                      no API key (credentials come from the environment)
+ *   3. Gemini API      GEMINI_API_KEY alone
+ *
+ * Measured 2026-07-25: the direct Gemini API returns 403
+ * API_KEY_SERVICE_BLOCKED for this project, while Vertex Express with the same
+ * key succeeds — so mode 1 is the working path today.
+ */
 const client = () => {
-  if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_NOT_CONFIGURED");
-  // Vertex AI path (fe63c3b): an Express Mode key sets only the flag; full
-  // Vertex with Application Default Credentials also needs project/location.
+  const apiKey = process.env.GEMINI_API_KEY;
   const useVertexAI = process.env.GOOGLE_GENAI_USE_VERTEXAI === "true";
-  return new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
-    vertexai: useVertexAI,
-    ...(useVertexAI && process.env.GOOGLE_CLOUD_PROJECT
-      ? {
-          project: process.env.GOOGLE_CLOUD_PROJECT,
-          location: process.env.GOOGLE_CLOUD_LOCATION || "global"
-        }
-      : {})
-  });
+  const project = process.env.GOOGLE_CLOUD_PROJECT;
+
+  if (useVertexAI && project && !apiKey) {
+    return new GoogleGenAI({
+      vertexai: true,
+      project,
+      location: process.env.GOOGLE_CLOUD_LOCATION || "global"
+    });
+  }
+
+  if (!apiKey) throw new Error("GEMINI_NOT_CONFIGURED");
+
+  // An API key is present, so never send project/location alongside it.
+  return new GoogleGenAI({ apiKey, vertexai: useVertexAI });
 };
 
 /** Whole corpus, for the calls that reason over a food log rather than one item. */
