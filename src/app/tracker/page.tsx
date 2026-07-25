@@ -6,13 +6,19 @@ import { BarChart3, CalendarDays, Pencil, Plus, Sparkles, Trash2 } from "lucide-
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AppShell } from "@/components/app-shell";
 import { StatusBadge } from "@/components/icons";
+import { WeekChat } from "@/components/week-chat";
+import { WeekJudgement } from "@/components/week-judgement";
 import { storage } from "@/lib/storage";
-import type { ConsumptionEntry } from "@/types";
+import type { ConsumptionEntry, WeeklySummary } from "@/types";
 
 export default function TrackerPage() {
   const [entries, setEntries] = useState<ConsumptionEntry[]>([]);
+  const [summary, setSummary] = useState<WeeklySummary | null>(null);
   const [meal, setMeal] = useState("all");
-  useEffect(() => setEntries(storage.entries()), []);
+  useEffect(() => {
+    setEntries(storage.entries());
+    setSummary(storage.summary());
+  }, []);
   const save = (next: ConsumptionEntry[]) => { setEntries(next); storage.saveEntries(next); };
   const filtered = meal === "all" ? entries : entries.filter((item) => item.mealType === meal);
   const byDay = useMemo(() => filtered.reduce<Record<string, ConsumptionEntry[]>>((acc, item) => {
@@ -51,6 +57,8 @@ export default function TrackerPage() {
             </div>
             <div className="card card-pad" style={{ background: "var(--lavender)" }}><div className="eyebrow">Nutrient-pattern preview</div><h2 style={{ margin: "9px 0" }}>What’s showing up in your log</h2><p className="muted" style={{ lineHeight: 1.6 }}>Your available entries include {entries.filter(e => (e.estimatedNutrients?.protein || 0) > 10).length} identifiable protein-rich choices and {entries.filter(e => (e.estimatedNutrients?.calcium || 0) > 100).length} calcium-containing choices. These are estimates from logged items only.</p><Link href="/weekly-summary" className="btn btn-primary"><Sparkles size={18} /> Generate full pattern analysis</Link></div>
           </section>
+          <WeekJudgement entries={entries} summary={summary} onSummary={setSummary} />
+          <WeekChat entries={entries} summary={summary} />
           <section className="card card-pad" style={{ marginTop: 20 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}><h2 style={{ margin: 0 }}>Daily food log</h2><select className="input" style={{ width: 150 }} value={meal} onChange={(e) => setMeal(e.target.value)}><option value="all">All meals</option><option>breakfast</option><option>lunch</option><option>dinner</option><option>snack</option></select></div>
             {Object.entries(byDay).map(([day, items]) => <div key={day} style={{ marginTop: 25 }}><div className="eyebrow">{day}</div>{items.map((entry) => <div key={entry.id} style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: 14, alignItems: "center", padding: "17px 0", borderBottom: "1px solid var(--line)" }}><div><b>{entry.itemName}</b><div className="muted" style={{ fontSize: 13, marginTop: 4, textTransform: "capitalize" }}>{entry.mealType} · {entry.quantity || "Quantity not set"}</div></div><StatusBadge status={entry.safetyStatus} /><div style={{ display: "flex", gap: 4 }}><button onClick={() => edit(entry)} aria-label={`Edit ${entry.itemName}`} style={{ border: 0, background: "transparent", cursor: "pointer", padding: 7 }}><Pencil size={16} /></button><button onClick={() => remove(entry.id)} aria-label={`Delete ${entry.itemName}`} style={{ border: 0, background: "transparent", cursor: "pointer", padding: 7, color: "#8a5250" }}><Trash2 size={16} /></button></div></div>)}</div>)}

@@ -29,6 +29,11 @@ const write = <T>(key: string, value: T) => {
   window.dispatchEvent(new Event("bumpsafe-storage"));
 };
 
+const drop = (...keys: string[]) => {
+  keys.forEach((key) => localStorage.removeItem(key));
+  window.dispatchEvent(new Event("bumpsafe-storage"));
+};
+
 export const storage = {
   profile: () => read<UserProfile>("bumpsafe-profile", DEFAULT_PROFILE),
   saveProfile: (profile: UserProfile) => write("bumpsafe-profile", profile),
@@ -42,5 +47,35 @@ export const storage = {
   saveEntries: (entries: ConsumptionEntry[]) => write("bumpsafe-entries", entries),
   seedEntries: () => write("bumpsafe-entries", demoEntries),
   summary: () => read<WeeklySummary | null>("bumpsafe-summary", null),
-  saveSummary: (summary: WeeklySummary) => write("bumpsafe-summary", summary)
+  saveSummary: (summary: WeeklySummary) => write("bumpsafe-summary", summary),
+
+  /** Forgets one food everywhere it appears, both as a scan and as a log entry. */
+  forgetFood: (name: string) => {
+    const match = (value: string) =>
+      value.trim().toLowerCase() === name.trim().toLowerCase();
+    write(
+      "bumpsafe-analyses",
+      read<FoodAnalysis[]>("bumpsafe-analyses", []).filter((item) => !match(item.itemName))
+    );
+    write(
+      "bumpsafe-entries",
+      read<ConsumptionEntry[]>("bumpsafe-entries", []).filter((item) => !match(item.itemName))
+    );
+  },
+
+  /** Everything this browser holds, for the profile's export action. */
+  exportAll: () => ({
+    exportedAt: new Date().toISOString(),
+    profile: read<UserProfile>("bumpsafe-profile", DEFAULT_PROFILE),
+    analyses: read<FoodAnalysis[]>("bumpsafe-analyses", []),
+    entries: read<ConsumptionEntry[]>("bumpsafe-entries", []),
+    summary: read<WeeklySummary | null>("bumpsafe-summary", null)
+  }),
+
+  /** Clears scans, logs and summaries but keeps the profile intact. */
+  clearActivity: () => drop("bumpsafe-analyses", "bumpsafe-entries", "bumpsafe-summary"),
+
+  /** Full reset, including the profile. */
+  clearEverything: () =>
+    drop("bumpsafe-analyses", "bumpsafe-entries", "bumpsafe-summary", "bumpsafe-profile")
 };

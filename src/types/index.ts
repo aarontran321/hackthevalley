@@ -92,3 +92,16 @@ export type WeeklySummary = {
 
 export const trimesterForWeek = (week: number) =>
   week <= 13 ? 1 : week <= 27 ? 2 : 3;
+
+/**
+ * Pregnancy is dated as 40 weeks from the last menstrual period, so the due date
+ * follows from the current week. `pregnancyWeek` stays the single source of truth
+ * that guidance is personalized against; this is a derived convenience only.
+ */
+export const estimatedDueDate = (week: number, from: Date = new Date()) => {
+  const due = new Date(from);
+  due.setDate(due.getDate() + (40 - week) * 7);
+  return due;
+};
+
+export const weeksRemaining = (week: number) => Math.max(0, 40 - week);

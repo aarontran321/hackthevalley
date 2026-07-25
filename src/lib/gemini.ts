@@ -115,6 +115,23 @@ export async function chatAboutAnalysis(profile: UserProfile, analysis: FoodAnal
   return response.text || "I’m sorry, I couldn’t prepare an answer right now.";
 }
 
+/**
+ * Follow-up chat scoped to a whole week of logged food, rather than to a single
+ * analysis the way chatAboutAnalysis is.
+ */
+export async function chatAboutWeek(
+  profile: UserProfile,
+  entries: ConsumptionEntry[],
+  summary: WeeklySummary | null,
+  messages: { role: string; content: string }[]
+) {
+  const response = await client().models.generateContent({
+    model,
+    contents: `${system}\nProfile: ${JSON.stringify(profile)}\nFoods logged this week: ${JSON.stringify(entries)}\nExisting weekly pattern summary (may be null): ${JSON.stringify(summary)}\nApproved sources: ${sourcesText}\nConversation: ${JSON.stringify(messages)}\nAnswer the latest question about this week of logged food in 2-4 calm, plain-language paragraphs. Reason only over the logged entries and the supplied source summaries. Describe patterns in what was logged rather than diagnosing a deficiency, and say plainly when the log is too sparse to answer. Suggest practical foods that respect the stated allergies, avoided foods, and dietary preferences.`
+  });
+  return response.text || "I’m sorry, I couldn’t prepare an answer right now.";
+}
+
 export async function summarizeWeek(profile: UserProfile, entries: ConsumptionEntry[]): Promise<WeeklySummary> {
   const response = await client().models.generateContent({
     model,
