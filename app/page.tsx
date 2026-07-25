@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { Chat } from "@/components/Chat";
 import { ConfirmFood, needsConfirmation } from "@/components/ConfirmFood";
 import { PhotoCapture } from "@/components/PhotoCapture";
 import { Receipt } from "@/components/Receipt";
@@ -18,7 +19,13 @@ import {
 } from "@/lib/profile";
 import type { FoodItem, IdentifiedFood, Verdict } from "@/lib/types";
 
-type Tab = "barcode" | "photo";
+type Tab = "barcode" | "photo" | "chat";
+
+const TAB_LABELS: Record<Tab, string> = {
+  barcode: "BARCODE",
+  photo: "PHOTO",
+  chat: "ASK",
+};
 
 type Screen =
   | { kind: "loading" }
@@ -140,7 +147,7 @@ export default function Home() {
           <Header profile={profile} onEdit={() => setScreen({ kind: "setup" })} />
 
           <div className="mx-auto flex w-full max-w-[420px] border-b border-rule">
-            {(["barcode", "photo"] as Tab[]).map((t) => (
+            {(["barcode", "photo", "chat"] as Tab[]).map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
@@ -149,21 +156,21 @@ export default function Home() {
                   tab === t ? "border-ink text-ink" : "border-transparent text-graphite"
                 }`}
               >
-                {t === "barcode" ? "BARCODE" : "PHOTO"}
+                {TAB_LABELS[t]}
               </button>
             ))}
           </div>
 
           {/* Keyed so switching tabs tears the old camera stream down. */}
-          {tab === "barcode" ? (
-            <Scanner key="barcode" onDecode={handleBarcode} />
-          ) : (
+          {tab === "barcode" && <Scanner key="barcode" onDecode={handleBarcode} />}
+          {tab === "photo" && (
             <PhotoCapture
               key="photo"
               onIdentified={handleIdentified}
               onError={(message) => setScreen({ kind: "error", message })}
             />
           )}
+          {tab === "chat" && profile && <Chat key="chat" profile={profile} />}
 
           {demo && tab === "barcode" && <DemoPicker onPick={handleBarcode} />}
         </div>

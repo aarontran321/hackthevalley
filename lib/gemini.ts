@@ -55,6 +55,14 @@ export function hasApiKey(): boolean {
 }
 
 /**
+ * Raw client, for the chat route's multi-turn tool loop. generateJson is
+ * single-shot by design and can't carry a conversation.
+ */
+export function getChatClient(): GoogleGenAI {
+  return getClient();
+}
+
+/**
  * Models sometimes wrap JSON in prose or a markdown fence even in JSON mode.
  * Recover the outermost object rather than throwing away a good response.
  */
