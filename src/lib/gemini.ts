@@ -96,10 +96,27 @@ const isRateLimit = (err: unknown) => {
   return status === 429 || /RESOURCE_EXHAUSTED|exceeded your current quota/i.test(msg);
 };
 
-const isFatal = (err: unknown) => {
-  const msg = err instanceof Error ? err.message : "";
-  return msg === "GEMINI_NOT_CONFIGURED" || msg === "INVALID_IMAGE";
-};
+/** Only a bad image is the caller's fault to fix; everything else degrades. */
+const isCallerError = (err: unknown) =>
+  (err instanceof Error ? err.message : "") === "INVALID_IMAGE";
+
+const isMissingKey = (err: unknown) =>
+  (err instanceof Error ? err.message : "") === "GEMINI_NOT_CONFIGURED";
+
+/**
+ * Why a rule-only analysis is being returned. Shown to the user in
+ * `limitations`, because a degraded answer they can't distinguish from a full
+ * one is worse than no answer.
+ */
+function degradedNote(err: unknown): string {
+  if (isMissingKey(err)) {
+    return "No Gemini key is configured, so this is the deterministic rule match only.";
+  }
+  if (isRateLimit(err)) {
+    return "The Gemini account is out of credit, so the plain-language explanation step did not run. This is the deterministic rule match against published guidance.";
+  }
+  return "The explanation step was unavailable, so this is the deterministic rule match only.";
+}
 
 /**
  * One retry, and only for faults a second attempt can fix. Retrying a 429 just
@@ -109,7 +126,7 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn();
   } catch (first) {
-    if (isRateLimit(first) || isFatal(first)) throw first;
+    if (isRateLimit(first) || isCallerError(first) || isMissingKey(first)) throw first;
     try {
       return await fn();
     } catch {
@@ -186,11 +203,14 @@ export async function analyseItem(input: {
     );
     parsed = foodAnalysisSchema.parse(repairJson(response.text || "")) as FoodAnalysis;
   } catch (error) {
-    // Rate limit and misconfiguration are surfaced honestly by the route.
-    if (isRateLimit(error) || isFatal(error)) throw error;
+    // A bad image is the only failure the caller can fix, so it's the only one
+    // that errors. Everything else — no key, depleted credit, a network blip —
+    // still has a deterministic rule result worth showing. A cited AVOID beats
+    // an error screen when someone is stood in an aisle holding a jar.
+    if (isCallerError(error)) throw error;
     const message = error instanceof Error ? error.message : "";
-    console.warn(`[analyse] model step failed, falling back to rules: ${message.slice(0, 200)}`);
-    return fallbackAnalysis(item, matches, profile);
+    console.warn(`[analyse] model step unavailable, using rules: ${message.slice(0, 160)}`);
+    return fallbackAnalysis(item, matches, profile, degradedNote(error));
   }
 
   // --- Layer 3: nothing reaches the UI without surviving this.
