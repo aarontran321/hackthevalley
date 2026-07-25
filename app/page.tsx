@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState, type CSSProperties } from "react";
 
 import { Chat } from "@/components/Chat";
 import { ConfirmFood, needsConfirmation } from "@/components/ConfirmFood";
+import { History } from "@/components/History";
+import { Home } from "@/components/Home";
 import { PhotoCapture } from "@/components/PhotoCapture";
 import { Receipt } from "@/components/Receipt";
 import { Scanner } from "@/components/Scanner";
@@ -11,10 +13,12 @@ import { Setup } from "@/components/Setup";
 import { getDemoVerdict, DEMO_VERDICTS } from "@/lib/demo";
 import { resolveGuidelineUrl } from "@/lib/guidelines";
 import {
+  loadHistory,
   loadProfile,
   type Profile,
   saveProfile,
   saveScan,
+  type ScanRecord,
   trimesterForWeek,
 } from "@/lib/profile";
 import type { FoodItem, IdentifiedFood, Verdict } from "@/lib/types";
@@ -30,14 +34,23 @@ const TAB_LABELS: Record<Tab, string> = {
 type Screen =
   | { kind: "loading" }
   | { kind: "setup" }
+  | { kind: "home" }
+  | { kind: "history" }
   | { kind: "scanning" }
   | { kind: "confirm"; food: IdentifiedFood; previewUrl?: string }
   | { kind: "working"; label: string }
-  | { kind: "verdict"; barcode?: string; verdict: Verdict; degraded?: string; saved?: boolean }
+  | {
+      kind: "verdict";
+      barcode?: string;
+      verdict: Verdict;
+      degraded?: string;
+      saved?: boolean;
+    }
   | { kind: "error"; message: string };
 
-export default function Home() {
+export default function Home_() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [history, setHistory] = useState<ScanRecord[]>([]);
   const [screen, setScreen] = useState<Screen>({ kind: "loading" });
   const [tab, setTab] = useState<Tab>("barcode");
   const [demo, setDemo] = useState(false);
@@ -51,7 +64,8 @@ export default function Home() {
     setDemo(new URLSearchParams(window.location.search).get("demo") === "1");
     const existing = loadProfile();
     setProfile(existing);
-    setScreen(existing ? { kind: "scanning" } : { kind: "setup" });
+    setHistory(loadHistory());
+    setScreen(existing ? { kind: "home" } : { kind: "setup" });
   }, []);
 
   const requestVerdict = useCallback(
@@ -126,7 +140,11 @@ export default function Home() {
     [requestVerdict],
   );
 
-  const reset = useCallback(() => setScreen({ kind: "scanning" }), []);
+  const goHome = useCallback(() => setScreen({ kind: "home" }), []);
+  const openScanner = useCallback((t: Tab) => {
+    setTab(t);
+    setScreen({ kind: "scanning" });
+  }, []);
 
   if (screen.kind === "loading") return <div className="px-5 py-8" aria-busy="true" />;
 
@@ -138,7 +156,7 @@ export default function Home() {
           onDone={(p) => {
             saveProfile(p);
             setProfile(p);
-            setScreen({ kind: "scanning" });
+            setScreen({ kind: "home" });
           }}
         />
       </div>
@@ -147,9 +165,53 @@ export default function Home() {
 
   return (
     <div className="px-5 py-8">
+      {screen.kind === "home" && profile && (
+        <Home
+          profile={profile}
+          history={history}
+          onScan={() => openScanner("barcode")}
+          onPhoto={() => openScanner("photo")}
+          onAsk={() => openScanner("chat")}
+          onOpenHistory={() => setScreen({ kind: "history" })}
+          onEdit={() => setScreen({ kind: "setup" })}
+          onOpenScan={(r) =>
+            setScreen({
+              kind: "verdict",
+              barcode: r.barcode,
+              verdict: r.verdict,
+              saved: true,
+            })
+          }
+        />
+      )}
+
+      {screen.kind === "history" && profile && (
+        <History
+          profile={profile}
+          history={history}
+          onBack={goHome}
+          onChanged={setHistory}
+          onOpenScan={(r) =>
+            setScreen({
+              kind: "verdict",
+              barcode: r.barcode,
+              verdict: r.verdict,
+              saved: true,
+            })
+          }
+        />
+      )}
+
       {screen.kind === "scanning" && (
         <div className="space-y-5">
-          <Header profile={profile} onEdit={() => setScreen({ kind: "setup" })} />
+          <div className="mx-auto flex w-full max-w-[420px] items-baseline justify-between">
+            <button onClick={goHome} className="font-mono text-xs text-graphite underline">
+              &larr; home
+            </button>
+            <p className="font-mono text-xs tracking-[0.16em] text-graphite">
+              WEEK {profile?.week} · TRIMESTER {trimesterForWeek(profile?.week ?? 20)}
+            </p>
+          </div>
 
           <div className="mx-auto flex w-full max-w-[420px] border-b border-rule">
             {(["barcode", "photo", "chat"] as Tab[]).map((t) => (
@@ -185,7 +247,7 @@ export default function Home() {
         <ConfirmFood
           food={screen.food}
           previewUrl={screen.previewUrl}
-          onRetake={reset}
+          onRetake={() => openScanner("photo")}
           onConfirm={(item) => void requestVerdict({ item }, item.name)}
         />
       )}
@@ -196,12 +258,20 @@ export default function Home() {
         <div className="mx-auto w-full max-w-[420px] space-y-4">
           <p className="font-display text-lg font-semibold">Couldn&rsquo;t read that one.</p>
           <p className="text-sm text-graphite">{screen.message}</p>
-          <button
-            onClick={reset}
-            className="rounded-xs border border-ink px-4 py-2 font-mono text-xs tracking-[0.14em]"
-          >
-            TRY AGAIN
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => openScanner(tab)}
+              className="rounded-xs border border-ink px-4 py-2 font-mono text-xs tracking-[0.14em]"
+            >
+              TRY AGAIN
+            </button>
+            <button
+              onClick={goHome}
+              className="rounded-xs border border-rule px-4 py-2 font-mono text-xs tracking-[0.14em] text-graphite"
+            >
+              HOME
+            </button>
+          </div>
         </div>
       )}
 
@@ -228,7 +298,9 @@ export default function Home() {
                   barcode: screen.barcode,
                   verdict: screen.verdict,
                   at: new Date().toISOString(),
+                  week: profile?.week,
                 });
+                setHistory(loadHistory());
                 setScreen({ ...screen, saved: true });
               }}
               className="flex-1 rounded-xs border border-ink px-4 py-3 font-mono text-xs tracking-[0.14em] disabled:border-rule disabled:text-graphite"
@@ -236,10 +308,15 @@ export default function Home() {
               {screen.saved ? "SAVED ✓" : "SAVE"}
             </button>
             <button
-              onClick={reset}
+              onClick={() => openScanner("barcode")}
               className="flex-1 rounded-xs bg-ink px-4 py-3 font-mono text-xs tracking-[0.14em] text-paper"
             >
               SCAN ANOTHER
+            </button>
+          </div>
+          <div className="mx-auto w-full max-w-[420px]">
+            <button onClick={goHome} className="font-mono text-xs text-graphite underline">
+              &larr; home
             </button>
           </div>
         </div>
@@ -293,20 +370,6 @@ function Working({ label }: { label: string }) {
           nothing is saved unless you tap save
         </p>
       </div>
-    </div>
-  );
-}
-
-function Header({ profile, onEdit }: { profile: Profile | null; onEdit: () => void }) {
-  if (!profile) return null;
-  return (
-    <div className="mx-auto flex w-full max-w-[420px] items-baseline justify-between">
-      <p className="font-mono text-xs tracking-[0.16em] text-graphite">
-        WEEK {profile.week} · TRIMESTER {trimesterForWeek(profile.week)}
-      </p>
-      <button onClick={onEdit} className="font-mono text-xs text-graphite underline">
-        edit
-      </button>
     </div>
   );
 }

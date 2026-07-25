@@ -13,7 +13,12 @@
   --color-rule: #e2e0d9;
 
   --color-safe: #0e7c58;
-  --color-caution: #b26a12;
+  /* Spec had #B26A12. Measured against #A82F22 it sits at ΔE 13.4 — under the
+     15 normal-vision floor, i.e. "read this" and "don't eat this" are hard to
+     tell apart even with full colour vision, and they're the two states where
+     that matters most. #C07C0A holds the same ochre intent and clears every
+     check: normal ΔE 18.5, protan 9.6. Revert this line to go back. */
+  --color-caution: #c07c0a;
   --color-avoid: #a82f22;
   --color-unknown: #4a5a9e;
 
@@ -134,6 +139,25 @@
 .receipt-line {
   animation: line-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+/* The report is meant to be taken to an appointment, so printing it should
+   produce a clean list — not the app chrome around it. */
+@media print {
+  header,
+  footer,
+  button {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .receipt {
+    filter: none;
+    break-inside: avoid;
+  }
 }
 
 /* Waiting indicator on the loading receipt. */

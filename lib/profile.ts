@@ -20,6 +20,9 @@ export interface ScanRecord {
   verdict: Verdict;
   /** ISO timestamp. */
   at: string;
+  /** Pregnancy week at the time of the scan. Older records predate this field —
+   *  guidance changes across 40 weeks, so "week 22" beats "three weeks ago". */
+  week?: number;
 }
 
 const PROFILE_KEY = "tare.profile.v1";
@@ -91,4 +94,15 @@ export function loadHistory(): ScanRecord[] {
 export function saveScan(record: ScanRecord): void {
   const next = [record, ...loadHistory()].slice(0, HISTORY_LIMIT);
   writeJson(HISTORY_KEY, next);
+}
+
+export function deleteScan(at: string): ScanRecord[] {
+  const next = loadHistory().filter((r) => r.at !== at);
+  writeJson(HISTORY_KEY, next);
+  return next;
+}
+
+export function clearHistory(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(HISTORY_KEY);
 }
