@@ -27,6 +27,17 @@ judgment:
 `UNKNOWN` is a designed state, not a failure. All user data stays in
 localStorage — no account, no database, nothing server-side to leak.
 
+## Surfaces
+
+| Screen | What it is |
+|---|---|
+| **Home** | Landing: scan button, photo/ask shortcuts, recent scans |
+| **Setup** | Week, diet, conditions — once, ~15 seconds |
+| **Scan** | `BARCODE` (webcam or typed) and `PHOTO` tabs |
+| **Verdict** | The receipt: severity, reasoning, cited flags, alternatives |
+| **Ask** | Chat with two tools, streamed, with an inline tool trace |
+| **History** | Every saved scan by day, plus overview and a copyable report |
+
 ## Running it
 
 ```bash

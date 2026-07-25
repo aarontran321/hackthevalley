@@ -24,6 +24,12 @@ function stripMarkdown(s: string): string {
     .trim();
 }
 
+function errorText(error?: string): string {
+  return error === "rate-limit"
+    ? "Out of API quota for today. The scanner still works from saved data."
+    : "Couldn't reach the assistant. Try again in a moment.";
+}
+
 const SUGGESTIONS = [
   "I'm craving something salty, what's safe?",
   "What have I scanned this week?",
@@ -66,23 +72,54 @@ export function Chat({ profile }: { profile: Profile }) {
         }),
       });
 
-      if (!res.ok) {
+      if (!res.ok || !res.body) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
-        setTurns([
-          ...next,
-          {
-            role: "model",
-            text:
-              body.error === "rate-limit"
-                ? "Out of API quota for today. The scanner still works from saved data."
-                : "Couldn't reach the assistant. Try again in a moment.",
-          },
-        ]);
+        setTurns([...next, { role: "model", text: errorText(body.error) }]);
         return;
       }
 
-      const data = (await res.json()) as { reply: string; trace?: Turn["trace"] };
-      setTurns([...next, { role: "model", text: data.reply, trace: data.trace }]);
+      // NDJSON: one JSON object per line. Trace events land as the tools run,
+      // text deltas as they're generated.
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffered = "";
+      let text = "";
+      const trace: NonNullable<Turn["trace"]> = [];
+      let failed: string | undefined;
+
+      const paint = () =>
+        setTurns([...next, { role: "model", text, trace: [...trace] }]);
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffered += decoder.decode(value, { stream: true });
+        const lines = buffered.split("\n");
+        // The last element is whatever arrived mid-line; keep it for next read.
+        buffered = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          let evt: { type: string; delta?: string; tool?: string; label?: string; error?: string };
+          try {
+            evt = JSON.parse(line);
+          } catch {
+            continue;
+          }
+
+          if (evt.type === "text" && evt.delta) text += evt.delta;
+          else if (evt.type === "trace" && evt.label) {
+            trace.push({ tool: evt.tool ?? "", label: evt.label });
+          } else if (evt.type === "error") failed = evt.error;
+        }
+        paint();
+      }
+
+      if (failed) setTurns([...next, { role: "model", text: errorText(failed) }]);
+      else if (!text.trim()) {
+        setTurns([...next, { role: "model", text: "No answer came back. Try rephrasing." }]);
+      }
     } catch {
       setTurns([...next, { role: "model", text: "Couldn't reach the assistant." }]);
     } finally {
