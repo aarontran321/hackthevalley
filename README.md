@@ -1,5 +1,7 @@
 # nutri.ai
 
+[![Watch the demo](https://img.youtube.com/vi/FIFTnvzTPYo/maxresdefault.jpg)](https://youtu.be/FIFTnvzTPYo)
+
 **Know what’s on your plate, and why it matters.**
 
 nutri.ai is an AI-powered pregnancy food-safety and nutrition assistant. It combines a user’s pregnancy stage, health context, allergies, and dietary preferences with product data, food images, and curated public-health guidance to produce calm, structured educational reports.
